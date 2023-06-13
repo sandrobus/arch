@@ -79,8 +79,6 @@ echo "Clave de usuario: $userpasswd"
 echo ''
 echo "Clave de Administrador: $rootpasswd"
 echo ''
-echo "Entorno de escritorio: $escritorio"
-echo ''
 
 # Vemos que opción elige el usuario y realiza tal acción en este caso mostrar mensaje
 case $escritorio in
@@ -213,9 +211,9 @@ else
 	# Esta variable pone la misma cantidad de Gib que tenemos en ram fisica
 	# free --giga | awk '/^Mem:/{print $2}'
 	swapsize=$(free --giga | awk '/^Mem:/{print $2}')
-    echo "Tamaño en GB para la partición Raiz o Root"
+    echo "Cuantas Gigas asignará para la partición Raiz o Root"
     rootsize=$(read line)
-    #dd if=/dev/zero of="${disco}" bs=100M count=10 status=progress
+    dd if=/dev/zero of="${disco}" bs=100M count=10 status=progress
 	sgdisk --zap-all ${disco}
 	(
       echo g     # Crear una nueva tabla de particiones GPT
@@ -223,7 +221,6 @@ else
       echo       # Número de partición (por defecto: 1)
       echo       # Primer sector (por defecto: primer sector disponible)
       echo +100M # Último sector (+100M para la partición de /boot)
-      echo n     # Negamos tipo de particion
       echo n     # Crear una nueva partición
       echo       # Número de partición 
       echo       # Primer sector (por defecto: primer sector disponible)
@@ -232,6 +229,7 @@ else
       echo       # Número de partición (por defecto: 3)
       echo       # Primer sector (por defecto: primer sector disponible)
       echo +${rootsize}G  # partición del sistema raíz /
+      #echo y     # Crear una nueva partición
       echo n     # Crear una nueva partición
       echo       # Número de partición (por defecto: 3)
       echo       # Primer sector (por defecto: primer sector disponible)
