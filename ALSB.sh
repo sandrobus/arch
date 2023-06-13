@@ -13,7 +13,7 @@
 # Lo cual vamos a guardar como variable para usarlo más adelante y en automatico
 
 echo  "<<<<<<<     Version     >>>>>>>>"
-echo  "<<<<<<<  202306-12-2054 >>>>>>>>"
+echo  "<<<<<<<  202306-12-2231 >>>>>>>>"
 
 idioma=$(curl https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF8|")
 echo ""
@@ -203,7 +203,7 @@ else
 	echo "Tu Sistema es BIOS-LEGACY"
 	echo ""
 	date "+%F %H:%M"
-	sleep 3
+	sleep 1
 	#Fuente: https://wiki.archlinux.org/index.php/GPT_fdisk
 
 	#Metodo con EFI - SWAP - ROOT - HOME
