@@ -229,7 +229,7 @@ else
       echo       # Número de partición (por defecto: 3)
       echo       # Primer sector (por defecto: primer sector disponible)
       echo +${rootsize}G  # partición del sistema raíz /
-      #echo y     # Crear una nueva partición
+      echo y     # Crear una nueva partición
       echo n     # Crear una nueva partición
       echo       # Número de partición (por defecto: 3)
       echo       # Primer sector (por defecto: primer sector disponible)
