@@ -73,6 +73,8 @@ printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
 echo ''
 echo "Selección de Disco: $disco"
 echo ''
+echo "Nombre del PC: $hostname"
+echo ''
 echo "Tu usuario: $user"
 echo ''
 echo "Clave de usuario: $userpasswd"
@@ -213,8 +215,9 @@ else
 	swapsize=$(free --giga | awk '/^Mem:/{print $2}')
     echo "Cuantas Gigas asignará para la partición Raiz o Root"
     rootsize=$(read line)
-    dd if=/dev/zero of="${disco}" bs=100M count=10 status=progress
-	sgdisk --zap-all ${disco}
+    #dd if=/dev/zero of="${disco}" bs=100M count=10 status=progress
+    sgdisk --zap-all ${disco} #borra todas las particiones
+	#sgdisk --zap-all ${disco}
 	(
       echo g     # Crear una nueva tabla de particiones GPT
       echo n     # Crear una nueva partición Boot Bios GPT
@@ -229,7 +232,7 @@ else
       echo       # Número de partición (por defecto: 3)
       echo       # Primer sector (por defecto: primer sector disponible)
       echo +${rootsize}G  # partición del sistema raíz /
-      echo y     # Crear una nueva partición
+      echo s     # Crear una nueva partición
       echo n     # Crear una nueva partición
       echo       # Número de partición (por defecto: 3)
       echo       # Primer sector (por defecto: primer sector disponible)
