@@ -218,8 +218,8 @@ else
 	(echo 2; echo w; echo Y) | gdisk ${disco}
 	sgdisk ${disco} -n=1:0:+100M         -t=1:ef02
 	sgdisk ${disco} -n=2:0:+${swapsize}G -t=2:8200
-	sgdisk ${disco} -n=3:0:+${rootsize}G -t=3:8200
-	sgdisk ${disco} -n=4:0:0
+	sgdisk ${disco} -n=3:0:+${rootsize}G -t=3:8304
+	sgdisk ${disco} -n=4:0:0             -t=3:8302
 	#(
     #  echo g     # Crear una nueva tabla de particiones GPT
     #  echo n     # Crear una nueva partición Boot Bios GPT
