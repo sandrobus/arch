@@ -211,15 +211,15 @@ else
 	# Esta variable pone la misma cantidad de Gib que tenemos en ram fisica
 	# free --giga | awk '/^Mem:/{print $2}'
 	swapsize=$(free --giga | awk '/^Mem:/{print $2}')
-    echo "Cuantas Gigas asignará para la partición Raiz o Root"
-    rootsize=$(read line)
+    #echo "Cuantas Gigas asignará para la partición Raiz o Root"
+    #rootsize=$(read line)
     #dd if=/dev/zero of="${disco}" bs=100M count=10 status=progress
     sgdisk --zap-all ${disco} #borra todas las particiones
 	#(echo 2; echo w; echo Y) | gdisk ${disco}
 	sgdisk ${disco} -n=1:0:+100M -t=1:ef02
 	fdisk -l
 	read line
-	sgdisk ${disco} -n=2:0:+$70G -t=2:8300
+	sgdisk ${disco} -n=2:0:+70G -t=2:8300
 	fdisk -l
 	read line
 	sgdisk ${disco} -n=3:0:0
