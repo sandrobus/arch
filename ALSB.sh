@@ -12,11 +12,10 @@
 
 # Lo cual vamos a guardar como variable para usarlo más adelante y en automatico
 
-# <<<<<<<     Version     >>>>>>>>
-# <<<<<<<  202306-12-1851 >>>>>>>>
+echo  "<<<<<<<     Version     >>>>>>>>"
+echo  "<<<<<<<  202306-12-2054 >>>>>>>>"
 
 idioma=$(curl https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF8|")
-clear
 echo ""
 echo "$idioma UTF-8" > /etc/locale.gen
 #echo "en_US UTF-8" > /etc/locale.gen
@@ -29,13 +28,8 @@ export $(cat /etc/locale.conf)
 locale-gen
 echo ""
 clear
-
-
-
 #Disco
-
 # discosdisponibles=$(lsblk -lno NAME,SIZE,TYPE | grep 'disk' | awk '{print "/dev/" $1 " " $2}' | sort -u)
-
 discosdisponibles=$(echo "print devices" | parted | grep /dev/ | awk '{if (NR!=1) {print}}' | sed '/sr/d')
 clear
 printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
@@ -45,10 +39,7 @@ echo ""
 echo $discosdisponibles
 echo ""
 printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
-
-
 # fdisk -l |  awk 'BEGIN{FS="bytes"","}{print $1} {print $2}' | grep ":" | sed '3d' | sed '4d' | sed '5d' | sed '3d'
-
 
 # Ingresar Datos de usuario
 echo ""
