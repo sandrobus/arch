@@ -116,9 +116,7 @@ echo "Para confirmar e instalar Arch Linux"
 echo ""
 echo "Presione ENTER o para salir presione CTRL + C"
 read line
-
-
-
+clear
 # DETECTA SI NUESTRO SISTEMA ES UEFI O BIOS GPT
 
 #uefi=$( ls /sys/firmware/efi/ | grep -ic efivars )
@@ -127,15 +125,7 @@ echo ""
 echo "Presione 2 para BIOS-LEGACY"
 uefi=$(read line)
 #uefi=0
-
-echo "Tamaño del Boot (Partición 1 en Megas MB)"
-partboot=$(read line)
-echo "Tamaño del Swap (Partición 2 en Gigas GB)"
-swapsize=$(read line)
-echo "Tamaño de la Raiz o Root (Partición 3 en Gigas GB)"
-raizsize=$(read line)
-echo "Tamaño de Home (Partición 4 Gigas GB restantes)"
-sleep 3
+clear
 
 if [ $uefi == 1 ]
 then
@@ -157,7 +147,7 @@ then
 	# Esta variable pone la misma cantidad de Gib que tenemos en ram fisica
 	# free --giga | awk '/^Mem:/{print $2}'
 
-	#swapsize=$(free --giga | awk '/^Mem:/{print $2}')
+	swapsize=$(free --giga | awk '/^Mem:/{print $2}')
 	#dd if=/dev/zero of="${disco}" bs=4M conv=fsync oflag=direct status=progress
 	(echo Ignore) | sgdisk --zap-all ${disco}
 	#parted ${disco} mklabel gpt
@@ -235,10 +225,14 @@ else
 	# free --giga | awk '/^Mem:/{print $2}'
 
 	#swapsize=$(free --giga | awk '/^Mem:/{print $2}')
-	#swapsize=2
-	#raizsize=10
-	#partboot=100
-	#homesize=5
+	echo "Tamaño del Boot (Partición 1 en Megas MB)"
+    partboot=$(read line)
+    echo "Tamaño del Swap (Partición 2 en Gigas GB)"
+    swapsize=$(read line)
+    echo "Tamaño de la Raiz o Root (Partición 3 en Gigas GB)"
+    raizsize=$(read line)
+    echo "Tamaño de Home (Partición 4 Gigas GB restantes)"
+    sleep 5
 	#dd if=/dev/zero of="${disco}" bs=4M conv=fsync oflag=direct status=progress
 	(echo Ignore) | sgdisk --zap-all ${disco}
 	#parted ${disco} mklabel gpt
