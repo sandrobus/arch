@@ -225,14 +225,19 @@ else
 	# free --giga | awk '/^Mem:/{print $2}'
 
 	#swapsize=$(free --giga | awk '/^Mem:/{print $2}')
-	echo "Tamaño del Boot (Partición 1 en Megas MB)"
+	echo "Establesca el tamaño del Boot (Partición 1 en Megas MB)"
     partboot=$(read line)
-    echo "Tamaño del Swap (Partición 2 en Gigas GB)"
+    echo "Establesca el tamaño del Swap (Partición 2 en Gigas GB)"
     swapsize=$(read line)
-    echo "Tamaño de la Raiz o Root (Partición 3 en Gigas GB)"
+    echo "Establesca el tamaño de la Raiz o Root (Partición 3 en Gigas GB)"
     raizsize=$(read line)
-    echo "Tamaño de Home (Partición 4 Gigas GB restantes)"
+    echo "Establesca el tamaño de Home (Partición 4 Gigas GB restantes)"
     sleep 5
+	echo "las particiones quedaron de la siguiete forma:"
+	echo "boot: ${partboot}M"
+	echo "Swap: ${swapsize}G"
+	echo "Raiz: ${raizsize}G"
+	echo "Home: Resto del disco"
 	#dd if=/dev/zero of="${disco}" bs=4M conv=fsync oflag=direct status=progress
 	(echo Ignore) | sgdisk --zap-all ${disco}
 	#parted ${disco} mklabel gpt
@@ -278,10 +283,6 @@ else
 	mkfs.ext4 $(cat home-bios) 
 	mkdir -p /mnt/home
 	mount $(cat home-bios) /mnt/home 
-
-	#mkdir -p /mnt/efi 
-	#mkfs.fat -F 32 $(cat boot-efi) 
-	#mount $(cat boot-efi) /mnt/efi
 
 	mkdir -p /mnt/boot
 	mkfs.ext4 $(cat boot-bios) 
