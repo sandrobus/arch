@@ -202,7 +202,6 @@ else
 	echo "Tu Sistema es BIOS Lagcy"
 	echo ""
 	date "+%F %H:%M"
-	sleep 3
 	#---Metodo con BIOS - SWAP - ROOT- HOME-------
 	#+100M 			particion boot
 	#+${swapsize}G	particion swap
@@ -210,7 +209,7 @@ else
 	#				Cambien valores si desean
 	# Esta variable pone la misma cantidad de Gib que tenemos en ram fisica
 	# free --giga | awk '/^Mem:/{print $2}'
-	swapsize=$(free --giga | awk '/^Mem:/{print $2}')
+	#swapsize=$(free --giga | awk '/^Mem:/{print $2}')
     #echo "Cuantas Gigas asignará para la partición Raiz o Root"
     #rootsize=$(read line)
     #dd if=/dev/zero of="${disco}" bs=100M count=10 status=progress
@@ -218,19 +217,17 @@ else
 	#(echo 2; echo w; echo Y) | gdisk ${disco}
 	sgdisk ${disco} -n=1:0:+100M -t=1:ef02
 	fdisk -l
-	read line
+	sleep 2
+	clar
 	sgdisk ${disco} -n=2:0:+70G -t=2:8300
 	fdisk -l
-	read line
+	sleep 2
+	clear
 	sgdisk ${disco} -n=3:0:0
 	fdisk -l
-	read line
+	sleep 2
 	clear
-	echo "Revise en punto de montaje en MOUNTPOINT - PRESIONE ENTER"
-	echo ""
-	lsblk -l
-	fdisk -l
-	read line
+	
 	#(
     #  echo g     # Crear una nueva tabla de particiones GPT
     #  echo n     # Crear una nueva partición Boot Bios GPT
@@ -253,8 +250,10 @@ else
     #) | fdisk ${disco}
 	fdisk -l ${disco} > /tmp/partition 
 	cat /tmp/partition
-	sleep 3
-
+	echo "Revise en punto de montaje en MOUNTPOINT - PRESIONE ENTER"
+	echo ""
+	lsblk
+    read line
 	partition="$(cat /tmp/partition | grep /dev/ | awk '{if (NR!=1) {print}}' | sed 's/*//g' | awk -F ' ' '{print $1}')"
 
 	echo $partition | awk -F ' ' '{print $1}' >  boot-bios
