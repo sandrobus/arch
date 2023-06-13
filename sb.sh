@@ -195,7 +195,6 @@ then
 	lsblk -l
 	read line
 
-
 else
 	clear
 	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
@@ -209,7 +208,6 @@ else
 	#+${swapsize}G	particion swap
 	#+100%			particion root
 	#				Cambien valores si desean
-
 	# Esta variable pone la misma cantidad de Gib que tenemos en ram fisica
 	# free --giga | awk '/^Mem:/{print $2}'
 	swapsize=$(free --giga | awk '/^Mem:/{print $2}')
@@ -217,31 +215,35 @@ else
     rootsize=$(read line)
     #dd if=/dev/zero of="${disco}" bs=100M count=10 status=progress
     sgdisk --zap-all ${disco} #borra todas las particiones
-	#sgdisk --zap-all ${disco}
-	(
-      echo g     # Crear una nueva tabla de particiones GPT
-      echo n     # Crear una nueva partición Boot Bios GPT
-      echo       # Número de partición (por defecto: 1)
-      echo       # Primer sector (por defecto: primer sector disponible)
-      echo +100M # Último sector (+100M para la partición de /boot)
-      echo n     # Crear una nueva partición
-      echo       # Número de partición 
-      echo       # Primer sector (por defecto: primer sector disponible)
-      echo +${swapsize}G  # temaño swap (partición del swap)
-      echo n     # Crear una nueva partición
-      echo       # Número de partición (por defecto: 3)
-      echo       # Primer sector (por defecto: primer sector disponible)
-      echo +${rootsize}G  # partición del sistema raíz /
-      echo s     # Crear una nueva partición
-      echo n     # Crear una nueva partición
-      echo       # Número de partición (por defecto: 3)
-      echo       # Primer sector (por defecto: primer sector disponible)
-      echo       # Último sector (por defecto: último sector disponible, usar todo el espacio restante)
-      echo t     # cambiar tipo de particion al boot
-      echo 1     # Nuemero de partición
-      echo 4     # Tipo de particion boot
-      echo w     # Guardar y salir
-    ) | fdisk ${disco}
+	(echo 2; echo w; echo Y) | gdisk ${disco}
+	sgdisk ${disco} -n=1:0:+100M         -t=1:ef02
+	sgdisk ${disco} -n=2:0:+${swapsize}G -t=2:8200
+	sgdisk ${disco} -n=3:0:+${rootsize}G -t=3:8200
+	sgdisk ${disco} -n=4:0:0
+	#(
+    #  echo g     # Crear una nueva tabla de particiones GPT
+    #  echo n     # Crear una nueva partición Boot Bios GPT
+    #  echo       # Número de partición (por defecto: 1)
+    #  echo       # Primer sector (por defecto: primer sector disponible)
+    #  echo +100M # Último sector (+100M para la partición de /boot)
+    #  echo n     # Crear una nueva partición
+    #  echo       # Número de partición 
+    #  echo       # Primer sector (por defecto: primer sector disponible)
+    #  echo +${swapsize}G  # temaño swap (partición del swap)
+    #  echo n     # Crear una nueva partición
+    #  echo       # Número de partición (por defecto: 3)
+    #  echo       # Primer sector (por defecto: primer sector disponible)
+    #  echo +${rootsize}G  # partición del sistema raíz 
+    #  echo s     # confirma una nueva partición
+    #  echo n     # Crear una nueva partición
+    #  echo       # Número de partición (por defecto: 3)
+    #  echo       # Primer sector (por defecto: primer sector disponible)
+    #  echo       # Último sector (por defecto: último sector disponible, usar todo el espacio restante)
+    #  echo t     # cambiar tipo de particion al boot
+    #  echo 1     # Nuemero de partición
+    #  echo 4     # Tipo de particion boot
+    #  echo w     # Guardar y salir
+    #) | fdisk ${disco}
 	fdisk -l ${disco} > /tmp/partition 
 	cat /tmp/partition
 	sleep 3
@@ -279,7 +281,6 @@ else
       mkswap $(cat swap-bios) 
 	  swapon $(cat swap-bios)
       mount $(cat root-bios) /mnt 
-      #--------
       mkdir /mnt/home
       mount $(cat home-bios) /mnt/home
     #mkfs.ext4 $(cat root-bios) 
@@ -339,18 +340,16 @@ clear
 
 
 # Configurando pacman para que tenga colores con el repo de MultiLib
-sed -i 's/#Color/Color/g' /mnt/etc/pacman.conf
-sed -i 's/#TotalDownload/TotalDownload/g' /mnt/etc/pacman.conf
-sed -i 's/#VerbosePkgLists/VerbosePkgLists/g' /mnt/etc/pacman.conf
-sed -i "37i ILoveCandy" /mnt/etc/pacman.conf
-sed -i 's/#[multilib]/[multilib]/g' /mnt/etc/pacman.conf
-sed -i "s/#Include = /etc/pacman.d/mirrorlist/Include = /etc/pacman.d/mirrorlist/g" /mnt/etc/pacman.conf
-clear
-
+#sed -i 's/#Color/Color/g' /mnt/etc/pacman.conf
+#sed -i 's/#TotalDownload/TotalDownload/g' /mnt/etc/pacman.conf
+#sed -i 's/#VerbosePkgLists/VerbosePkgLists/g' /mnt/etc/pacman.conf
+#sed -i "37i ILoveCandy" /mnt/etc/pacman.conf
+#sed -i 's/#[multilib]/[multilib]/g' /mnt/etc/pacman.conf
+#sed -i "s/#Include = /etc/pacman.d/mirrorlist/Include = /etc/pacman.d/mirrorlist/g" /mnt/etc/pacman.conf
+#clear
 
 #Hosts y Nombre de computador
 clear
-#hostname=ArcriS
 echo "$hostname" > /mnt/etc/hostname
 echo "127.0.1.1 $hostname.localdomain $hostname" > /mnt/etc/hosts
 clear
@@ -468,10 +467,8 @@ clear
 arch-chroot /mnt /bin/bash -c "pacman -S grub os-prober --noconfirm"
 echo '' 
 arch-chroot /mnt /bin/bash -c "grub-install --target=i386-pc $disco"
-######
 sed -i "6iGRUB_CMDLINE_LINUX_DEFAULT="loglevel=3"" /mnt/etc/default/grub
 sed -i '7d' /mnt/etc/default/grub
-######
 echo ''
 arch-chroot /mnt /bin/bash -c "grub-mkconfig -o /boot/grub/grub.cfg"
 echo '' 
@@ -586,7 +583,7 @@ case $escritorio in
 	clear
 
 	# Formatos de lectura de todo tipo de discos incluido android
-	#arch-chroot /mnt /bin/bash -c "pacman -S android-file-transfer android-tools android-udev msmtp libmtp libcddb gvfs gvfs-afc gvfs-smb gvfs-gphoto2 gvfs-mtp gvfs-goa gvfs-nfs gvfs-google dosfstools jfsutils f2fs-tools btrfs-progs exfat-utils ntfs-3g reiserfsprogs udftools xfsprogs nilfs-utils polkit gpart mtools --noconfirm"
+	arch-chroot /mnt /bin/bash -c "pacman -S android-file-transfer android-tools android-udev msmtp libmtp libcddb gvfs gvfs-afc gvfs-smb gvfs-gphoto2 gvfs-mtp gvfs-goa gvfs-nfs gvfs-google dosfstools jfsutils f2fs-tools btrfs-progs exfat-utils ntfs-3g reiserfsprogs udftools xfsprogs nilfs-utils polkit gpart mtools --noconfirm"
 
 	# Audio
 	arch-chroot /mnt /bin/bash -c "pacman -S pulseaudio pavucontrol --noconfirm"
@@ -676,7 +673,7 @@ case $escritorio in
 	clear
 
 	# Formatos de lectura de todo tipo de discos incluido android
-	#arch-chroot /mnt /bin/bash -c "pacman -S android-file-transfer android-tools android-udev msmtp libmtp libcddb gvfs gvfs-afc gvfs-smb gvfs-gphoto2 gvfs-mtp gvfs-goa gvfs-nfs gvfs-google dosfstools jfsutils f2fs-tools btrfs-progs exfat-utils ntfs-3g reiserfsprogs udftools xfsprogs nilfs-utils polkit gpart mtools --noconfirm"
+	arch-chroot /mnt /bin/bash -c "pacman -S android-file-transfer android-tools android-udev msmtp libmtp libcddb gvfs gvfs-afc gvfs-smb gvfs-gphoto2 gvfs-mtp gvfs-goa gvfs-nfs gvfs-google dosfstools jfsutils f2fs-tools btrfs-progs exfat-utils ntfs-3g reiserfsprogs udftools xfsprogs nilfs-utils polkit gpart mtools --noconfirm"
 
 	# Audio
 	arch-chroot /mnt /bin/bash -c "pacman -S pulseaudio pavucontrol --noconfirm"
@@ -696,7 +693,9 @@ case $escritorio in
     clear
   ;;
 esac
-
+#Programas Adicionales
+echo "PROGRAMAS PERSONALES"
+arch-chroot /mnt /bin/bash -c "pacman -S gparted libreoffice rhythmbox vscode plank psensor transmission-gtk kodi steam vlc --noconfirm"
 
 #DESMONTAR Y REINICIAR
 umount -R /mnt
