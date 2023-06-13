@@ -209,7 +209,7 @@ else
 	#				Cambien valores si desean
 	# Esta variable pone la misma cantidad de Gib que tenemos en ram fisica
 	# free --giga | awk '/^Mem:/{print $2}'
-	#swapsize=$(free --giga | awk '/^Mem:/{print $2}')
+	swapsize=$(free --giga | awk '/^Mem:/{print $2}')
     #echo "Cuantas Gigas asignará para la partición Raiz o Root"
     #rootsize=$(read line)
     #dd if=/dev/zero of="${disco}" bs=100M count=10 status=progress
@@ -219,11 +219,15 @@ else
 	fdisk -l
 	sleep 2
 	clar
-	sgdisk ${disco} -n=2:0:+70G -t=2:8300
+	sgdisk ${disco} -n=2:0:+${swapsize}G -t=2:8200
 	fdisk -l
 	sleep 2
 	clear
-	sgdisk ${disco} -n=3:0:0
+	sgdisk ${disco} -n=3:0:+70G -t=2:8300
+	fdisk -l
+	sleep 2
+	clear
+	sgdisk ${disco} -n=4:0:0
 	fdisk -l
 	sleep 2
 	clear
@@ -257,9 +261,9 @@ else
 	partition="$(cat /tmp/partition | grep /dev/ | awk '{if (NR!=1) {print}}' | sed 's/*//g' | awk -F ' ' '{print $1}')"
 
 	echo $partition | awk -F ' ' '{print $1}' >  boot-bios
-	echo $partition | awk -F ' ' '{print $2}' >  root-bios
-    echo $partition | awk -F ' ' '{print $3}' >  home-bios
-   #echo $partition | awk -F ' ' '{print $4}' >  swap-bios
+	echo $partition | awk -F ' ' '{print $2}' >  swap-bios
+    echo $partition | awk -F ' ' '{print $3}' >  root-bios
+    echo $partition | awk -F ' ' '{print $4}' >  home-bios
 
 	clear
 	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
@@ -267,9 +271,9 @@ else
 	echo "Partición BOOT es:" 
 	cat boot-bios
 	echo ""
-	#echo "Partición SWAP es:"
-	#cat swap-bios
-	#echo ""
+	echo "Partición SWAP es:"
+	cat swap-bios
+	echo ""
 	echo "Partición ROOT es:"
 	cat root-bios
     echo ""
@@ -283,8 +287,8 @@ else
       mkfs.ext4 $(cat root-bios)
       mkfs.ext4 $(cat home-bios)
       # Montar las particiones
-      #mkswap $(cat swap-bios) 
-	  #swapon $(cat swap-bios)
+      mkswap $(cat swap-bios) 
+	  swapon $(cat swap-bios)
       mount $(cat root-bios) /mnt 
       mkdir /mnt/home
       mount $(cat home-bios) /mnt/home
