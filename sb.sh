@@ -215,35 +215,31 @@ else
     rootsize=$(read line)
     #dd if=/dev/zero of="${disco}" bs=100M count=10 status=progress
     sgdisk --zap-all ${disco} #borra todas las particiones
-	(echo 2; echo w; echo Y) | gdisk ${disco}
-	sgdisk ${disco} -n=1:0:+100M         -t=1:ef02
-	sgdisk ${disco} -n=2:0:+${swapsize}G -t=2:8200
-	sgdisk ${disco} -n=3:0:+${rootsize}G -t=3:8304
-	sgdisk ${disco} -n=4:0:0             -t=3:8302
-	#(
-    #  echo g     # Crear una nueva tabla de particiones GPT
-    #  echo n     # Crear una nueva partición Boot Bios GPT
-    #  echo       # Número de partición (por defecto: 1)
-    #  echo       # Primer sector (por defecto: primer sector disponible)
-    #  echo +100M # Último sector (+100M para la partición de /boot)
-    #  echo n     # Crear una nueva partición
-    #  echo       # Número de partición 
-    #  echo       # Primer sector (por defecto: primer sector disponible)
-    #  echo +${swapsize}G  # temaño swap (partición del swap)
-    #  echo n     # Crear una nueva partición
-    #  echo       # Número de partición (por defecto: 3)
-    #  echo       # Primer sector (por defecto: primer sector disponible)
-    #  echo +${rootsize}G  # partición del sistema raíz 
-    #  echo s     # confirma una nueva partición
-    #  echo n     # Crear una nueva partición
-    #  echo       # Número de partición (por defecto: 3)
-    #  echo       # Primer sector (por defecto: primer sector disponible)
-    #  echo       # Último sector (por defecto: último sector disponible, usar todo el espacio restante)
-    #  echo t     # cambiar tipo de particion al boot
-    #  echo 1     # Nuemero de partición
-    #  echo 4     # Tipo de particion boot
-    #  echo w     # Guardar y salir
-    #) | fdisk ${disco}
+	#(echo 2; echo w; echo Y) | gdisk ${disco}
+	#sgdisk ${disco} -n=1:0:+100M         -t=1:ef02
+	#sgdisk ${disco} -n=2:0:+${swapsize}G -t=2:8200
+	#sgdisk ${disco} -n=3:0:+${rootsize}G -t=3:8304
+	#sgdisk ${disco} -n=4:0:0             -t=3:8302
+	(
+      echo g     # Crear una nueva tabla de particiones GPT
+      echo n     # Crear una nueva partición Boot Bios GPT
+      echo       # Número de partición (por defecto: 1)
+      echo       # Primer sector (por defecto: primer sector disponible)
+      echo +100M # Último sector (+100M para la partición de /boot)
+      echo n     # Crear una nueva partición
+      echo       # Número de partición 
+      echo       # Primer sector (por defecto: primer sector disponible)
+      echo +${rootsize}G  # partición del sistema raíz 
+      #echo s     # confirma una nueva partición
+      echo n     # Crear una nueva partición
+      echo       # Número de partición (por defecto: 3)
+      echo       # Primer sector (por defecto: primer sector disponible)
+      echo       # Último sector (por defecto: último sector disponible, usar todo el espacio restante)
+      echo t     # cambiar tipo de particion al boot
+      echo 1     # Nuemero de partición
+      echo 4     # Tipo de particion boot
+      echo w     # Guardar y salir
+    ) | fdisk ${disco}
 	fdisk -l ${disco} > /tmp/partition 
 	cat /tmp/partition
 	sleep 3
@@ -251,9 +247,9 @@ else
 	partition="$(cat /tmp/partition | grep /dev/ | awk '{if (NR!=1) {print}}' | sed 's/*//g' | awk -F ' ' '{print $1}')"
 
 	echo $partition | awk -F ' ' '{print $1}' >  boot-bios
-	echo $partition | awk -F ' ' '{print $2}' >  swap-bios
-	echo $partition | awk -F ' ' '{print $3}' >  root-bios
-    echo $partition | awk -F ' ' '{print $4}' >  home-bios
+	echo $partition | awk -F ' ' '{print $2}' >  root-bios
+    echo $partition | awk -F ' ' '{print $3}' >  home-bios
+   #echo $partition | awk -F ' ' '{print $4}' >  swap-bios
 
 	clear
 	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
@@ -261,9 +257,9 @@ else
 	echo "Partición BOOT es:" 
 	cat boot-bios
 	echo ""
-	echo "Partición SWAP es:"
-	cat swap-bios
-	echo ""
+	#echo "Partición SWAP es:"
+	#cat swap-bios
+	#echo ""
 	echo "Partición ROOT es:"
 	cat root-bios
     echo ""
@@ -276,10 +272,9 @@ else
 	echo "Formateando Particiones"	# Formateo de particiones
       mkfs.ext4 $(cat root-bios)
       mkfs.ext4 $(cat home-bios)
-            
       # Montar las particiones
-      mkswap $(cat swap-bios) 
-	  swapon $(cat swap-bios)
+      #mkswap $(cat swap-bios) 
+	  #swapon $(cat swap-bios)
       mount $(cat root-bios) /mnt 
       mkdir /mnt/home
       mount $(cat home-bios) /mnt/home
@@ -291,11 +286,12 @@ else
 
 	clear
 	echo ""
-	echo "Revise en punto de montaje en MOUNTPOINT"
+	echo "Revise en punto de montaje en MOUNTPOINT - PRESIONE ENTER"
 	echo ""
 	lsblk -l
-	sleep 24
-	clear
+	read line
+	fdisk -l
+	read line
 	
 fi
 
