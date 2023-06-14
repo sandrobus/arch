@@ -333,7 +333,7 @@ echo ""
 # Pacstrap Base:
 pacstrap /mnt base base-devel nano reflector python rsync
 # Pacstrap Personalizado:
-pacstrap /mnt base base-devel nano reflector python rsync
+#pacstrap /mnt base base-devel nano reflector python rsync
 clear
 
 # Creando Archiv FSTAB para detectar al iniciar el sistema
@@ -502,8 +502,14 @@ clear
 #arch-chroot /mnt /bin/bash -c "chsh -s /bin/$SH $user"
 #clear
 
-# Directorios del sistema
+    # Directorios y appś del sistema personal
+
+echo "Appś personales"
 arch-chroot /mnt /bin/bash -c "pacman -S git wget neofetch lsb-release xdg-user-dirs gparted libreoffice rhythmbox vscode plank psensor transmission-gtk kodi steam vlc --noconfirm"
+echo "validar instalacion de programas y presiones enter!!!!!"
+echo ""
+read line
+echo "Directorios del sistema"
 arch-chroot /mnt /bin/bash -c "xdg-user-dirs-update"
 echo ""
 arch-chroot /mnt /bin/bash -c "ls /home/$user"
