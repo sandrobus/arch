@@ -287,11 +287,13 @@ else
 	clear
 	echo ""
 	echo "Formateando Particiones"	# Formateo de particiones
-      mkfs.ext4 $(cat root-bios)
-      mkfs.ext4 $(cat home-bios)
-      # Montar las particiones
       mkswap $(cat swap-bios) 
 	  swapon $(cat swap-bios)
+	  mkfs.ext4 $(cat root-bios) --noconfirm
+	  sleep 2
+      mkfs.ext4 $(cat home-bios) --noconfirm
+	  sleep 2
+      # Montar las particiones
       mount $(cat root-bios) /mnt 
       mkdir /mnt/home
       mount $(cat home-bios) /mnt/home
@@ -328,6 +330,9 @@ clear
 echo ""
 echo "Instalando Sistema base"
 echo ""
+# Pacstrap Base:
+pacstrap /mnt base base-devel nano reflector python rsync
+# Pacstrap Personalizado:
 pacstrap /mnt base base-devel nano reflector python rsync
 clear
 
@@ -498,7 +503,7 @@ clear
 #clear
 
 # Directorios del sistema
-arch-chroot /mnt /bin/bash -c "pacman -S git wget neofetch lsb-release xdg-user-dirs --noconfirm"
+arch-chroot /mnt /bin/bash -c "pacman -S git wget neofetch lsb-release xdg-user-dirs gparted libreoffice rhythmbox vscode plank psensor transmission-gtk kodi steam vlc --noconfirm"
 arch-chroot /mnt /bin/bash -c "xdg-user-dirs-update"
 echo ""
 arch-chroot /mnt /bin/bash -c "ls /home/$user"
@@ -580,12 +585,6 @@ clear
 
 	# Navegador Web
 	arch-chroot /mnt /bin/bash -c "pacman -S firefox --noconfirm"
-clear
-
-	#Programas Adicionales
-    echo "PROGRAMAS PERSONALES"
-	sleep 4
-    arch-chroot /mnt /bin/bash -c "pacman -S gparted libreoffice rhythmbox vscode plank psensor transmission-gtk kodi steam vlc --noconfirm"
 clear
 
   ;;
