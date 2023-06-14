@@ -1,9 +1,11 @@
 #!/bin/bash
+clear
+echo ""
 echo "Creador Código Cristo"
 #https://www.patreon.com/codigocristo
-
+echo ""
 echo "Sistema en español en liveCD"
-
+echo ""
 # El resultado de Curl aqui es: es-PE,qu,ay
 # curl https://ipapi.co/languages  
 
@@ -12,6 +14,7 @@ echo "Sistema en español en liveCD"
 
 # Lo cual vamos a guardar como variable para usarlo más adelante y en automatico
 echo "Verions GPT-BIOS GPT-UEFI 202306-1319"
+echo ""
 sleep 3
 idioma=$(curl https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF8|")
 echo ""
@@ -210,21 +213,21 @@ else
 	# Esta variable pone la misma cantidad de Gib que tenemos en ram fisica
 	# free --giga | awk '/^Mem:/{print $2}'
 	#swapsize=$(free --giga | awk '/^Mem:/{print $2}')
-	echo "Gigas para la partición Swap"
-	swapsize=$(read line)
-    echo "Gigas para la partición Raiz o Root"
-    rootsize=$(read line)
+	#echo "Gigas para la partición Swap"
+	#swapsize=$(read line)
+    #echo "Gigas para la partición Raiz o Root"
+    #rootsize=$(read line)
     #dd if=/dev/zero of="${disco}" bs=100M count=10 status=progress
     sgdisk --zap-all ${disco} #borra todas las particiones
 	#(echo 2; echo w; echo Y) | gdisk ${disco}
 	sgdisk ${disco} -n=1:0:+100M         -t=1:ef02
 	sleep 2
 	clear
-	sgdisk ${disco} -n=2:0:+${swapsize}G -t=2:8200
+	sgdisk ${disco} -n=2:0:+2G -t=2:8200
 	fdisk -l
 	sleep 2
 	clear
-	sgdisk ${disco} -n=3:0:+${rootsize}G -t=2:8300
+	sgdisk ${disco} -n=3:0:+30G -t=2:8300
 	fdisk -l
 	sleep 2
 	clear
