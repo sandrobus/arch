@@ -1,8 +1,8 @@
 #!/bin/bash
-#Creador Código Cristo
+echo "Creador Código Cristo"
 #https://www.patreon.com/codigocristo
 
-#Sistema en español en liveCD
+echo "Sistema en español en liveCD"
 
 # El resultado de Curl aqui es: es-PE,qu,ay
 # curl https://ipapi.co/languages  
@@ -11,9 +11,9 @@
 # curl https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF8 UTF-8|"
 
 # Lo cual vamos a guardar como variable para usarlo más adelante y en automatico
-clear
+echo "Verions GPT-BIOS GPT-UEFI 202306-1319"
+sleep 3
 idioma=$(curl https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF8|")
-clear
 echo ""
 echo "$idioma UTF-8" > /etc/locale.gen
 locale-gen
@@ -209,21 +209,22 @@ else
 	#				Cambien valores si desean
 	# Esta variable pone la misma cantidad de Gib que tenemos en ram fisica
 	# free --giga | awk '/^Mem:/{print $2}'
-	swapsize=$(free --giga | awk '/^Mem:/{print $2}')
-    #echo "Cuantas Gigas asignará para la partición Raiz o Root"
-    #rootsize=$(read line)
+	#swapsize=$(free --giga | awk '/^Mem:/{print $2}')
+	echo "Gigas para la partición Swap"
+	swapsize=$(read line)
+    echo "Gigas para la partición Raiz o Root"
+    rootsize=$(read line)
     #dd if=/dev/zero of="${disco}" bs=100M count=10 status=progress
     sgdisk --zap-all ${disco} #borra todas las particiones
 	#(echo 2; echo w; echo Y) | gdisk ${disco}
-	sgdisk ${disco} -n=1:0:+100M -t=1:ef02
-	fdisk -l
+	sgdisk ${disco} -n=1:0:+100M         -t=1:ef02
 	sleep 2
-	clar
+	clear
 	sgdisk ${disco} -n=2:0:+${swapsize}G -t=2:8200
 	fdisk -l
 	sleep 2
 	clear
-	sgdisk ${disco} -n=3:0:+70G -t=2:8300
+	sgdisk ${disco} -n=3:0:+${rootsize}G -t=2:8300
 	fdisk -l
 	sleep 2
 	clear
@@ -231,8 +232,7 @@ else
 	fdisk -l
 	sleep 2
 	clear
-	
-	#(
+		#(
     #  echo g     # Crear una nueva tabla de particiones GPT
     #  echo n     # Crear una nueva partición Boot Bios GPT
     #  echo       # Número de partición (por defecto: 1)
@@ -254,9 +254,9 @@ else
     #) | fdisk ${disco}
 	fdisk -l ${disco} > /tmp/partition 
 	cat /tmp/partition
-	echo "Revise en punto de montaje en MOUNTPOINT - PRESIONE ENTER"
 	echo ""
 	lsblk
+	echo "Revise en punto de montaje en MOUNTPOINT - PRESIONE ENTER"
     read line
 	partition="$(cat /tmp/partition | grep /dev/ | awk '{if (NR!=1) {print}}' | sed 's/*//g' | awk -F ' ' '{print $1}')"
 
@@ -279,7 +279,7 @@ else
     echo ""
     echo "Partición HOME es:"
 	cat home-bios
-	sleep 5
+	sleep 3
 
 	clear
 	echo ""
@@ -292,24 +292,17 @@ else
       mount $(cat root-bios) /mnt 
       mkdir /mnt/home
       mount $(cat home-bios) /mnt/home
-    #mkfs.ext4 $(cat root-bios) 
-	#mount $(cat root-bios) /mnt 
-	#mkdir -p /mnt/boot
-	#mkfs.ext4 $(cat boot-bios) 
-	#mount $(cat boot-bios) /mnt/boot
-
+    
 	clear
 	echo ""
 	echo "Revise en punto de montaje en MOUNTPOINT - PRESIONE ENTER"
 	echo ""
 	lsblk -l
-	read line
+	sleep 3
 	fdisk -l
 	read line
 	
 fi
-
-
 
 # Actualización de llaves y mirroslist del LIVECD
 clear
@@ -328,14 +321,12 @@ cat /etc/pacman.d/mirrorlist
 sleep 3
 clear
 
-
 # Instalando Sistema base en nuestro Disco
 echo ""
 echo "Instalando Sistema base"
 echo ""
 pacstrap /mnt base base-devel nano reflector python rsync
 clear
-
 
 # Creando Archiv FSTAB para detectar al iniciar el sistema
 echo ""
@@ -348,17 +339,16 @@ cat /mnt/etc/fstab
 sleep 4
 clear
 
-
 # Configurando pacman para que tenga colores con el repo de MultiLib
-#sed -i 's/#Color/Color/g' /mnt/etc/pacman.conf
-#sed -i 's/#TotalDownload/TotalDownload/g' /mnt/etc/pacman.conf
-#sed -i 's/#VerbosePkgLists/VerbosePkgLists/g' /mnt/etc/pacman.conf
-#sed -i "37i ILoveCandy" /mnt/etc/pacman.conf
-#sed -i 's/#[multilib]/[multilib]/g' /mnt/etc/pacman.conf
-#sed -i "s/#Include = /etc/pacman.d/mirrorlist/Include = /etc/pacman.d/mirrorlist/g" /mnt/etc/pacman.conf
-#clear
+sed -i 's/#Color/Color/g' /mnt/etc/pacman.conf
+sed -i 's/#TotalDownload/TotalDownload/g' /mnt/etc/pacman.conf
+sed -i 's/#VerbosePkgLists/VerbosePkgLists/g' /mnt/etc/pacman.conf
+sed -i "37i ILoveCandy" /mnt/etc/pacman.conf
+sed -i 's/#[multilib]/[multilib]/g' /mnt/etc/pacman.conf
+sed -i "s/#Include = /etc/pacman.d/mirrorlist/Include = /etc/pacman.d/mirrorlist/g" /mnt/etc/pacman.conf
+clear
 
-#Hosts y Nombre de computador
+# Hosts y Nombre de computador
 clear
 echo "$hostname" > /mnt/etc/hostname
 echo "127.0.1.1 $hostname.localdomain $hostname" > /mnt/etc/hosts
@@ -369,14 +359,12 @@ echo "Hosts: $(cat /mnt/etc/hosts)"
 echo ""
 clear
 
-
 # Agregando usuario y claves con administrador
 arch-chroot /mnt /bin/bash -c "(echo $rootpasswd ; echo $rootpasswd) | passwd root"
 arch-chroot /mnt /bin/bash -c "useradd -m -g users -s /bin/bash $user"
 arch-chroot /mnt /bin/bash -c "(echo $userpasswd ; echo $userpasswd) | passwd $user"
 sed -i "80i $user ALL=(ALL) ALL"  /mnt/etc/sudoers
 clear
-
 
 # Idioma del sistema
 printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
@@ -402,9 +390,8 @@ export $exportlang
 export LANG=$idioma
 locale-gen
 arch-chroot /mnt /bin/bash -c "locale-gen" 
-clear
 sleep 3
-
+clear
 
 # Zona horaria Automatica
 arch-chroot /mnt /bin/bash -c "pacman -Sy curl --noconfirm"
@@ -419,14 +406,12 @@ sleep 3
 rm zonahoraria
 clear
 
-
 # Establecer un mapa de teclado para la terminal virtual
 curl https://ipapi.co/languages | awk -F "," '{print $1}' | sed -e's/.$//' | sed -e's/.$//' | sed -e's/.$//' > keymap
 keymap=$(cat keymap)
 echo "KEYMAP=$keymap" > /mnt/etc/vconsole.conf 
 cat /mnt/etc/vconsole.conf 
 clear
-
 
 # Actualiza lista de mirrors en tu disco
 echo ""
@@ -438,11 +423,9 @@ cat /mnt/etc/pacman.d/mirrorlist
 sleep 3
 clear
 
-
 # Instalación del kernel stable
 arch-chroot /mnt /bin/bash -c "pacman -S linux-firmware linux linux-headers mkinitcpio --noconfirm"
 clear
-
 
 # Instalación de GRUB - Arranque
 if [ $uefi == 1 ]
@@ -456,10 +439,8 @@ arch-chroot /mnt /bin/bash -c 'grub-install --target=x86_64-efi --efi-directory=
 echo '' 
 echo 'Instalando UEFI System >> grubx64.efi' 
 arch-chroot /mnt /bin/bash -c 'grub-install --target=x86_64-efi --efi-directory=/efi --bootloader-id=Arch'
-######
 sed -i "6iGRUB_CMDLINE_LINUX_DEFAULT="loglevel=3"" /mnt/etc/default/grub
 sed -i '7d' /mnt/etc/default/grub
-######
 echo ''
 arch-chroot /mnt /bin/bash -c "grub-mkconfig -o /boot/grub/grub.cfg"
 echo '' 
@@ -492,8 +473,6 @@ echo '> Confirme tener la carpeta de GRUB para el arranque'
 fi
 
 clear
-
-
 # Ethernet
 arch-chroot /mnt /bin/bash -c "pacman -S dhcpcd networkmanager iwd net-tools ifplugd --noconfirm"
 arch-chroot /mnt /bin/bash -c "systemctl enable dhcpcd NetworkManager"
@@ -501,32 +480,27 @@ echo "noipv6rs" >> /mnt/etc/dhcpcd.conf
 echo "noipv6" >> /mnt/etc/dhcpcd.conf
 clear
 
-
 # Wifi
 #arch-chroot /mnt /bin/bash -c "pacman -S iw wireless_tools wpa_supplicant dialog wireless-regdb --noconfirm"
-
 
 # Bluutuuu
 #arch-chroot /mnt /bin/bash -c "pacman -S bluez bluez-utils pulseaudio-bluetooth"
 
-
 # Shell del sistema
-arch-chroot /mnt /bin/bash -c "pacman -S zsh zsh-completions zsh-syntax-highlighting zsh-autosuggestions --noconfirm"
-SH=zsh
-arch-chroot /mnt /bin/bash -c "chsh -s /bin/$SH"
-arch-chroot /mnt /bin/bash -c "chsh -s /usr/bin/$SH $user"
-arch-chroot /mnt /bin/bash -c "chsh -s /bin/$SH $user"
-clear
-
+#arch-chroot /mnt /bin/bash -c "pacman -S zsh zsh-completions zsh-syntax-highlighting zsh-autosuggestions --noconfirm"
+#SH=zsh
+#arch-chroot /mnt /bin/bash -c "chsh -s /bin/$SH"
+#arch-chroot /mnt /bin/bash -c "chsh -s /usr/bin/$SH $user"
+#arch-chroot /mnt /bin/bash -c "chsh -s /bin/$SH $user"
+#clear
 
 # Directorios del sistema
 arch-chroot /mnt /bin/bash -c "pacman -S git wget neofetch lsb-release xdg-user-dirs --noconfirm"
 arch-chroot /mnt /bin/bash -c "xdg-user-dirs-update"
 echo ""
 arch-chroot /mnt /bin/bash -c "ls /home/$user"
-sleep 5
+sleep 3
 clear
-
 
 # Driver de Vídeo automatico solo driver Libres
 if (lspci | grep VGA | grep "NVIDIA\|nVidia" &>/dev/null); then
@@ -550,9 +524,7 @@ else
 arch-chroot /mnt /bin/bash -c "pacman -S xf86-video-vesa xf86-video-fbdev mesa mesa-libgl lib32-mesa --noconfirm"
 
 fi
-
 clear
-
 
 # Escritorio seleccionado
 case $escritorio in
@@ -564,23 +536,23 @@ case $escritorio in
 
   2)
     echo "Escritorio : Xfce4"
-    sleep 3
+    sleep 2
 
     # Instala Xorg
 	arch-chroot /mnt /bin/bash -c "pacman -S xorg xorg-apps xorg-xinit xorg-twm xterm xorg-xclock --noconfirm"
-
+clear
     # Programas de Xfce4
     arch-chroot /mnt /bin/bash -c "pacman -S xfce4 xfce4-goodies network-manager-applet ffmpegthumbs ffmpegthumbnailer --noconfirm"
-	
+clear	
 	# Programas para Login
 	arch-chroot /mnt /bin/bash -c "pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings light-locker accountsservice --noconfirm"
 	arch-chroot /mnt /bin/bash -c "systemctl enable lightdm"
-
+clear
 	# Establecer formato de teclado dentro de Xorg
 	keymap="latam"
 	# Aqui podemos ponerlo en " latam - es - us " 
 	# Algún otro idioma que queremos para nuestro teclado mi caso es : latam
-
+clear
 	touch /mnt/etc/X11/xorg.conf.d/00-keyboard.conf
 	echo -e 'Section "InputClass"' > /mnt/etc/X11/xorg.conf.d/00-keyboard.conf
 	echo -e 'Identifier "system-keyboard"' >> /mnt/etc/X11/xorg.conf.d/00-keyboard.conf
@@ -590,22 +562,29 @@ case $escritorio in
 	echo ""
 	cat /mnt/etc/X11/xorg.conf.d/00-keyboard.conf
 	sleep 5
-	clear
+clear
 
 	# Formatos de lectura de todo tipo de discos incluido android
 	arch-chroot /mnt /bin/bash -c "pacman -S android-file-transfer android-tools android-udev msmtp libmtp libcddb gvfs gvfs-afc gvfs-smb gvfs-gphoto2 gvfs-mtp gvfs-goa gvfs-nfs gvfs-google dosfstools jfsutils f2fs-tools btrfs-progs exfat-utils ntfs-3g reiserfsprogs udftools xfsprogs nilfs-utils polkit gpart mtools --noconfirm"
-
+clear
 	# Audio
 	arch-chroot /mnt /bin/bash -c "pacman -S pulseaudio pavucontrol --noconfirm"
-	clear
+clear
 
 	# Fonts
 	arch-chroot /mnt /bin/bash -c "pacman -S gnu-free-fonts ttf-hack ttf-inconsolata gnome-font-viewer --noconfirm"
-	clear
+clear
 
 	# Navegador Web
 	arch-chroot /mnt /bin/bash -c "pacman -S firefox --noconfirm"
-	clear
+clear
+
+	#Programas Adicionales
+    echo "PROGRAMAS PERSONALES"
+	sleep 4
+    arch-chroot /mnt /bin/bash -c "pacman -S gparted libreoffice rhythmbox vscode plank psensor transmission-gtk kodi steam vlc --noconfirm"
+clear
+
   ;;
 
   3)
@@ -703,9 +682,6 @@ case $escritorio in
     clear
   ;;
 esac
-#Programas Adicionales
-echo "PROGRAMAS PERSONALES"
-arch-chroot /mnt /bin/bash -c "pacman -S gparted libreoffice rhythmbox vscode plank psensor transmission-gtk kodi steam vlc --noconfirm"
 
 #DESMONTAR Y REINICIAR
 umount -R /mnt
@@ -716,7 +692,7 @@ echo "Visita: https://t.me/ArchLinuxCristo"
 echo ""
 echo "Apóyame en Patreon: "
 echo "https://www.patreon.com/codigocristo"
-sleep 5
+sleep 3
 reboot
 
 
