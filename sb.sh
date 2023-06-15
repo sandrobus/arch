@@ -219,7 +219,7 @@ else
 	#				Cambien valores si desean
 	# Esta variable pone la misma cantidad de Gib que tenemos en ram fisica
 	# free --giga | awk '/^Mem:/{print $2}'
-	#swapsize=$(free --giga | awk '/^Mem:/{print $2}')
+	swapsize=$(free --giga | awk '/^Mem:/{print $2}')
 	#echo "Gigas para la partición Swap"
 	#swapsize=$(read line)
     #echo "Gigas para la partición Raiz o Root"
@@ -228,19 +228,20 @@ else
     sgdisk --zap-all ${disco} #borra todas las particiones
 	#(echo 2; echo w; echo Y) | gdisk ${disco}
 	sgdisk ${disco} -n=1:0:+100M -t=1:ef02
-	sleep 2
-	clear
-	sgdisk ${disco} -n=2:0:+2G   -t=2:8200
 	fdisk -l
-	sleep 2
+	sleep 4
+	clear
+	sgdisk ${disco} -n=2:0:+${swapsize}G -t=2:8200
+	fdisk -l
+	sleep 4
 	clear
 	sgdisk ${disco} -n=3:0:+70G  -t=2:8300
 	fdisk -l
-	sleep 2
+	sleep 4
 	clear
 	sgdisk ${disco} -n=4:0:0
 	fdisk -l
-	sleep 2
+	sleep 4
 	clear
 		#(
     #  echo g     # Crear una nueva tabla de particiones GPT
@@ -296,10 +297,12 @@ else
 	echo "Formateando Particiones"	# Formateo de particiones
       mkswap $(cat swap-bios) 
 	  swapon $(cat swap-bios)
-	  mkfs.ext4 $(cat root-bios) --noconfirm
-	  sleep 2
-      mkfs.ext4 $(cat home-bios) --noconfirm
-	  sleep 2
+	  mkfs.ext4 $(cat root-bios) 
+	  echo >>> pesione s para SI o Entrer para continuar <<<<
+	  read line
+      mkfs.ext4 $(cat home-bios)
+	  echo >>> pesione s para SI o Entrer para continuar <<<<
+	  read line
       # Montar las particiones
       mount $(cat root-bios) /mnt 
       mkdir /mnt/home
@@ -399,7 +402,7 @@ clear
 # Idioma del sistema
     echo ""
 	echo "******************************************************************************"
-	echo "<<<<<<<<<<<<<<<<<<  Idioma del sistema  >>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "<<<<<<<<<<<<<<<<<<       Idioma del sistema        >>>>>>>>>>>>>>>>>>>>>>>>>>>"
 	echo "******************************************************************************"
 	echo ""
 printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
@@ -544,16 +547,11 @@ clear
 #arch-chroot /mnt /bin/bash -c "chsh -s /bin/$SH $user"
 #clear
 
-    # Directorios y appś del sistema personal
-    echo "********A**********************************************************************"
-	echo "<<<<<<<<<<<<<<<<<<<<<<< Appś del sistema personal >>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-	echo "*******************************************************************************"
-arch-chroot /mnt /bin/bash -c "yes | pacman -S --noconfirm libreoffice git wget neofetch lsb-release xdg-user-dirs gparted rhythmbox vscode plank psensor transmission-gtk kodi vlc"
-echo "validar instalacion de programas y presiones enter!!!!!"
-echo ""
-#arch-chroot /mnt /bin/bash -c "yes | pacman -S staem--noconfirm"
-read line
-echo "Directorios del sistema"
+    echo ""
+	echo "******************************************************************************"
+	echo "<<<<<<<<<<             Directorios del sistema                   >>>>>>>>>>>>>"
+	echo "******************************************************************************"
+	echo ""
 arch-chroot /mnt /bin/bash -c "xdg-user-dirs-update"
 echo ""
 arch-chroot /mnt /bin/bash -c "ls /home/$user"
@@ -596,7 +594,7 @@ case $escritorio in
 
   2)
     echo ""
-	echo "********A**********************************************************************"
+	echo "*******************************************************************************"
 	echo "<<<<<<<<<<<<<<<<<<<<<<<   "Escritorio : Xfce4"    >>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 	echo "*******************************************************************************"
 	echo ""
@@ -740,9 +738,24 @@ clear
     clear
   ;;
 esac
-# Consola de juegos
-	arch-chroot /mnt /bin/bash -c "pacman -S steam --noconfirm"
-	sleep 5
+
+    # Directorios y appś del sistema personal
+	echo ""
+    echo "****************************************************************************************"
+	echo "                      <            PROGRAMAS               >"
+	echo "                      <            PERSONALES              >"
+	echo "****************************************************************************************"
+	echo ""
+arch-chroot /mnt /bin/bash -c "yes | pacman -S --noconfirm libreoffice git wget neofetch lsb-release xdg-user-dirs gparted rhythmbox vscode plank psensor transmission-gtk kodi vlc"
+
+    echo ""
+	echo "******************************************************************************"
+	echo "<<<<<<<<<<         validar instalacion de programas              >>>>>>>>>>>>>"
+	echo "******************************************************************************"
+	echo ""
+    sleep 5
+	clear
+
 #DESMONTAR Y REINICIAR
 umount -R /mnt
 swapoff -a
@@ -751,7 +764,14 @@ echo "Visita: https://t.me/ArchLinuxCristo"
 echo ""
 echo "Apóyame en Patreon: "
 echo "https://www.patreon.com/codigocristo"
-read line
+    echo ""
+	echo "********************************************************************************************"
+	echo ">>>>>>>>                     Terminamos, reinicioamos                 >>>>>>>>>>>>>>>>>>>>>>"
+	echo "<<<<<<<                                y                              >>>>>>>>>>>>>>>>>>>>>>"
+	echo ">>>>>>>>                debe retire el medio de inatlación            <<<<<<<<<<<<<<<<<<<<<<"
+	echo "********************************************************************************************"
+	echo ""
+    sleep 5
 reboot
 
 
