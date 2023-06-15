@@ -1,11 +1,14 @@
 #!/bin/bash
 clear
-echo ""
-echo "Creador Código Cristo"
+    echo ""
+    echo ""
+	echo "******************************************************************************"
+	echo "<<<<<<<<<<<<<<<<<<     "Creador Código Cristo"     >>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "<<<<<<<<<<<<<<<<<  "Sistema en español en liveCD"  >>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "<<<<<<<<<<<<<<  Verions GPT-BIOS GPT-UEFI 202306-1319 >>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "******************************************************************************"
+	echo ""
 #https://www.patreon.com/codigocristo
-echo ""
-echo "Sistema en español en liveCD"
-echo ""
 # El resultado de Curl aqui es: es-PE,qu,ay
 # curl https://ipapi.co/languages  
 
@@ -13,9 +16,7 @@ echo ""
 # curl https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF8 UTF-8|"
 
 # Lo cual vamos a guardar como variable para usarlo más adelante y en automatico
-echo "Verions GPT-BIOS GPT-UEFI 202306-1319"
-echo ""
-sleep 3
+sleep 2
 idioma=$(curl https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF8|")
 echo ""
 echo "$idioma UTF-8" > /etc/locale.gen
@@ -59,9 +60,12 @@ echo ""
 
 # Escritorios
 printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
-echo ""
-echo "Ingresa una opción marcando el numero correcto: (1 - 2 - 3 - 4)"
-echo ""
+    echo ""
+	echo "******************************************************************************"
+	echo "<<<<<<<<<<<<<<<<<<     ENTORNO DE ESCRITORIO       >>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "<<< Ingresa una opción marcando el numero correcto: (1 - 2 - 3 - 4)  >>>>>>>>>"
+	echo "******************************************************************************"
+	echo ""
 echo "1. Terminal Virtual (TTY)"
 echo "2. Xfce4"
 echo "3. Kde Plasma"
@@ -220,7 +224,7 @@ else
 	#swapsize=$(read line)
     #echo "Gigas para la partición Raiz o Root"
     #rootsize=$(read line)
-    dd if=/dev/zero of="${disco}" bs=100M count=10 status=progress
+    #dd if=/dev/zero of="${disco}" bs=100M count=10 status=progress
     sgdisk --zap-all ${disco} #borra todas las particiones
 	#(echo 2; echo w; echo Y) | gdisk ${disco}
 	sgdisk ${disco} -n=1:0:+100M -t=1:ef02
@@ -427,7 +431,7 @@ clear
 # Zona horaria Automatica
     echo ""
 	echo "******************************************************************************"
-	echo "<<<<<<<<<<<<<<<<<<  Zona horaria Automatica  >>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "<<<<<<<<<<<<<<<<<<     Zona horaria Automatica     >>>>>>>>>>>>>>>>>>>>>>>>>>>"
 	echo "******************************************************************************"
 	echo ""
 arch-chroot /mnt /bin/bash -c "pacman -Sy curl --noconfirm"
