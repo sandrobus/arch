@@ -202,7 +202,10 @@ else
 	clear
 	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
 	echo ""
-	echo "Tu Sistema es BIOS Lagcy"
+	echo "******************************************************************************"
+	echo "<<<<<              PARTICIONAMIENTO DE DISCO                    >>>>>>>>>>>>>>"
+	echo "<<<<<        Tabla de Particion GPT en BIOS Lagcy               >>>>>>>>>>>>>>"
+	echo "******************************************************************************"
 	echo ""
 	date "+%F %H:%M"
 	#---Metodo con BIOS - SWAP - ROOT- HOME-------
@@ -217,17 +220,17 @@ else
 	#swapsize=$(read line)
     #echo "Gigas para la partición Raiz o Root"
     #rootsize=$(read line)
-    #dd if=/dev/zero of="${disco}" bs=100M count=10 status=progress
+    dd if=/dev/zero of="${disco}" bs=100M count=10 status=progress
     sgdisk --zap-all ${disco} #borra todas las particiones
 	#(echo 2; echo w; echo Y) | gdisk ${disco}
-	sgdisk ${disco} -n=1:0:+100M         -t=1:ef02
+	sgdisk ${disco} -n=1:0:+100M -t=1:ef02
 	sleep 2
 	clear
-	sgdisk ${disco} -n=2:0:+2G -t=2:8200
+	sgdisk ${disco} -n=2:0:+2G   -t=2:8200
 	fdisk -l
 	sleep 2
 	clear
-	sgdisk ${disco} -n=3:0:+30G -t=2:8300
+	sgdisk ${disco} -n=3:0:+70G  -t=2:8300
 	fdisk -l
 	sleep 2
 	clear
@@ -300,12 +303,12 @@ else
     
 	clear
 	echo ""
-	echo "Revise en punto de montaje en MOUNTPOINT - PRESIONE ENTER"
-	echo ""
 	lsblk -l
-	sleep 3
-	fdisk -l
-	read line
+	echo "********************************************************************************"
+	echo "<<<<<<<< Revise en punto de montaje en MOUNTPOINT - PRESIONE ENTER >>>>>>>>>>>>>"
+	echo "********************************************************************************"
+	read
+	
 	
 fi
 
@@ -327,9 +330,9 @@ sleep 3
 clear
 
 # Instalando Sistema base en nuestro Disco
-echo ""
-echo "Instalando Sistema base"
-echo ""
+echo "********************************************************************************"
+echo ">>>>>>>>>>>>>>>>>>>>>>>   Instalando Sistema base   >>>>>>>>>>>>>>>>>>><>>>>>>>>"
+echo "********************************************************************************"
 # Pacstrap Base:
 pacstrap /mnt base base-devel nano reflector python rsync
 # Pacstrap Personalizado:
@@ -337,6 +340,11 @@ pacstrap /mnt base base-devel nano reflector python rsync
 clear
 
 # Creando Archiv FSTAB para detectar al iniciar el sistema
+    echo ""
+	echo "******************************************************************************"
+	echo "<<<<<  Creando Archiv FSTAB para detectar al iniciar el sistema >>>>>>>>>>>>>>"
+	echo "******************************************************************************"
+	echo ""
 echo ""
 echo "Archivo FSTAB"
 echo ""
@@ -348,6 +356,11 @@ sleep 4
 clear
 
 # Configurando pacman para que tenga colores con el repo de MultiLib
+    echo ""
+	echo "******************************************************************************"
+	echo "<<<<<<<<<<<<<   Pacman colores y repo de MultiLib   >>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "******************************************************************************"
+	echo ""
 sed -i 's/#Color/Color/g' /mnt/etc/pacman.conf
 sed -i 's/#TotalDownload/TotalDownload/g' /mnt/etc/pacman.conf
 sed -i 's/#VerbosePkgLists/VerbosePkgLists/g' /mnt/etc/pacman.conf
@@ -368,6 +381,11 @@ echo ""
 clear
 
 # Agregando usuario y claves con administrador
+    echo ""
+	echo "******************************************************************************"
+	echo "<<<<<<<<<<<<<<<  usuario y claves con administrador  >>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "******************************************************************************"
+	echo ""
 arch-chroot /mnt /bin/bash -c "(echo $rootpasswd ; echo $rootpasswd) | passwd root"
 arch-chroot /mnt /bin/bash -c "useradd -m -g users -s /bin/bash $user"
 arch-chroot /mnt /bin/bash -c "(echo $userpasswd ; echo $userpasswd) | passwd $user"
@@ -375,6 +393,11 @@ sed -i "80i $user ALL=(ALL) ALL"  /mnt/etc/sudoers
 clear
 
 # Idioma del sistema
+    echo ""
+	echo "******************************************************************************"
+	echo "<<<<<<<<<<<<<<<<<<  Idioma del sistema  >>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "******************************************************************************"
+	echo ""
 printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
 echo -e ""
 echo -e "\t\t\t| Idioma del Sistema |"
@@ -402,6 +425,11 @@ sleep 3
 clear
 
 # Zona horaria Automatica
+    echo ""
+	echo "******************************************************************************"
+	echo "<<<<<<<<<<<<<<<<<<  Zona horaria Automatica  >>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "******************************************************************************"
+	echo ""
 arch-chroot /mnt /bin/bash -c "pacman -Sy curl --noconfirm"
 curl https://ipapi.co/timezone > zonahoraria
 zonahoraria=$(cat zonahoraria)
@@ -432,6 +460,11 @@ sleep 3
 clear
 
 # Instalación del kernel stable
+    echo ""
+	echo "******************************************************************************"
+	echo "<<<<<<<<<<<<<<<<<<  Instalación del kernel stable  >>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "******************************************************************************"
+	echo ""
 arch-chroot /mnt /bin/bash -c "pacman -S linux-firmware linux linux-headers mkinitcpio --noconfirm"
 clear
 
@@ -482,6 +515,11 @@ fi
 
 clear
 # Ethernet
+    echo ""
+	echo "******************************************************************************"
+	echo "<<<<<<<<<<<<<<<<<<<<<<       "Ethernet"          >>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "******************************************************************************"
+	echo ""
 arch-chroot /mnt /bin/bash -c "pacman -S dhcpcd networkmanager iwd net-tools ifplugd --noconfirm"
 arch-chroot /mnt /bin/bash -c "systemctl enable dhcpcd NetworkManager"
 echo "noipv6rs" >> /mnt/etc/dhcpcd.conf
@@ -503,11 +541,13 @@ clear
 #clear
 
     # Directorios y appś del sistema personal
-
-echo "Appś personales"
-arch-chroot /mnt /bin/bash -c "pacman -S git wget neofetch lsb-release xdg-user-dirs gparted libreoffice rhythmbox vscode plank psensor transmission-gtk kodi steam vlc --noconfirm"
+    echo "********A**********************************************************************"
+	echo "<<<<<<<<<<<<<<<<<<<<<<< Appś del sistema personal >>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "*******************************************************************************"
+arch-chroot /mnt /bin/bash -c "yes | pacman -S --noconfirm libreoffice git wget neofetch lsb-release xdg-user-dirs gparted rhythmbox vscode plank psensor transmission-gtk kodi vlc"
 echo "validar instalacion de programas y presiones enter!!!!!"
 echo ""
+#arch-chroot /mnt /bin/bash -c "yes | pacman -S staem--noconfirm"
 read line
 echo "Directorios del sistema"
 arch-chroot /mnt /bin/bash -c "xdg-user-dirs-update"
@@ -515,7 +555,9 @@ echo ""
 arch-chroot /mnt /bin/bash -c "ls /home/$user"
 sleep 3
 clear
-
+    echo "********A**********************************************************************"
+	echo "<<<<<<<<<<<<<<<<<<<<<<<    Drivers de VGA o GPU   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "*******************************************************************************"
 # Driver de Vídeo automatico solo driver Libres
 if (lspci | grep VGA | grep "NVIDIA\|nVidia" &>/dev/null); then
 #Nvidia
@@ -549,7 +591,11 @@ case $escritorio in
   ;;
 
   2)
-    echo "Escritorio : Xfce4"
+    echo ""
+	echo "********A**********************************************************************"
+	echo "<<<<<<<<<<<<<<<<<<<<<<<   "Escritorio : Xfce4"    >>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "*******************************************************************************"
+	echo ""
     sleep 2
 
     # Instala Xorg
@@ -690,17 +736,18 @@ clear
     clear
   ;;
 esac
-
+# Consola de juegos
+	arch-chroot /mnt /bin/bash -c "pacman -S steam --noconfirm"
+	sleep 5
 #DESMONTAR Y REINICIAR
 umount -R /mnt
 swapoff -a
-clear
 echo ""
 echo "Visita: https://t.me/ArchLinuxCristo"
 echo ""
 echo "Apóyame en Patreon: "
 echo "https://www.patreon.com/codigocristo"
-sleep 3
+read line
 reboot
 
 
