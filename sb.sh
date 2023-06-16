@@ -122,11 +122,27 @@ read line
 
 
 # DETECTA SI NUESTRO SISTEMA ES UEFI O BIOS LEGACY
+	echo ""
+	echo "******************************************************************************"
+	echo "<<<<<              SELECCIÓN MANUAL                             >>>>>>>>>>>>>>"
+	echo "<<<<<       GPT en UEFI                PRESIONE 1               >>>>>>>>>>>>>>"
+	echo "<<<<<       GPT en BIOS Lagcy          PRESIONE 2               >>>>>>>>>>>>>>"
+	echo "<<<<<       PREVIA PARTICION MANUAL    PRESIONE 3               >>>>>>>>>>>>>>"
+	echo "<<<<<       DETECCIÓN AUTOMÁTICA       PRESIONE 4               >>>>>>>>>>>>>>"
+	echo "<<<<<                                                           >>>>>>>>>>>>>>"
+	echo "******************************************************************************"
+	read -p "Introduce la opción de particionado: " uefi
+    echo ""
+	echo "Seccionaste la opción: $uefi"
+	sleep 3
 
-uefi=$( ls /sys/firmware/efi/ | grep -ic efivars )
+if   [ $uefi == 4 ]
+ then
+ uefi=$( ls /sys/firmware/efi/ | grep -ic efivars )
 
-if [ $uefi == 1 ]
-then
+elif [ $uefi == 1 ]
+ then
+
 	clear
 	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
 	echo ""
@@ -202,7 +218,7 @@ then
 	lsblk -l
 	read line
 
-else
+elif [ $uefi == 2 ]
 	clear
 	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
 	echo ""
@@ -314,9 +330,15 @@ else
 	echo "********************************************************************************"
 	echo "<<<<<<<< Revise en punto de montaje en MOUNTPOINT - PRESIONE ENTER >>>>>>>>>>>>>"
 	echo "********************************************************************************"
-	read
+	read line
 	
-	
+else
+    echo "*************************************************************************************"
+	echo "<<<<<<<< SE DEFINIÓ MANUALMENTE EL PARTICIONAMIENTO Y PUNTOS DE MONTAJE >>>>>>>>>>>>>"
+	echo "<<<<<<<<            CONTINUAMOS CON LA INSTALACION DE ARCH              >>>>>>>>>>>>>"
+	echo "*************************************************************************************"
+	sleep 5
+
 fi
 
 # Actualización de llaves y mirroslist del LIVECD
