@@ -128,19 +128,18 @@ read line
 	echo "<<<<<       GPT en UEFI                PRESIONE 1               >>>>>>>>>>>>>>"
 	echo "<<<<<       GPT en BIOS Lagcy          PRESIONE 2               >>>>>>>>>>>>>>"
 	echo "<<<<<       PREVIA PARTICION MANUAL    PRESIONE 3               >>>>>>>>>>>>>>"
-	echo "<<<<<       DETECCIÓN AUTOMÁTICA       PRESIONE 4               >>>>>>>>>>>>>>"
 	echo "<<<<<                                                           >>>>>>>>>>>>>>"
 	echo "******************************************************************************"
 	read -p "Introduce la opción de particionado: " uefi
     echo ""
 	echo "Seccionaste la opción: $uefi"
 	sleep 3
+	
+ #uefi=$( ls /sys/firmware/efi/ | grep -ic efivars )
 
-if   [ $uefi == 4 ]
- then
- uefi=$( ls /sys/firmware/efi/ | grep -ic efivars )
+elif
 
-elif [ $uefi == 1 ]
+if   [ $uefi == 1 ]
  then
 
 	clear
@@ -251,7 +250,7 @@ elif [ $uefi == 2 ]
 	fdisk -l
 	sleep 4
 	clear
-	sgdisk ${disco} -n=3:0:+70G  -t=2:8300
+	sgdisk ${disco} -n=3:0:+35G  -t=2:8300
 	fdisk -l
 	sleep 4
 	clear
@@ -259,26 +258,6 @@ elif [ $uefi == 2 ]
 	fdisk -l
 	sleep 4
 	clear
-		#(
-    #  echo g     # Crear una nueva tabla de particiones GPT
-    #  echo n     # Crear una nueva partición Boot Bios GPT
-    #  echo       # Número de partición (por defecto: 1)
-    #  echo       # Primer sector (por defecto: primer sector disponible)
-    #  echo +100M # Último sector (+100M para la partición de /boot)
-    #  echo n     # Crear una nueva partición
-    #  echo       # Número de partición 
-    #  echo       # Primer sector (por defecto: primer sector disponible)
-    #  echo +${rootsize}G  # partición del sistema raíz 
-    #  #echo s     # confirma una nueva partición
-    #  echo n     # Crear una nueva partición
-    #  echo       # Número de partición (por defecto: 3)
-    #  echo       # Primer sector (por defecto: primer sector disponible)
-    #  echo       # Último sector (por defecto: último sector disponible, usar todo el espacio restante)
-    #  echo t     # cambiar tipo de particion al boot
-    #  echo 1     # Nuemero de partición
-    #  echo 4     # Tipo de particion boot
-    #  echo w     # Guardar y salir
-    #) | fdisk ${disco}
 	fdisk -l ${disco} > /tmp/partition 
 	cat /tmp/partition
 	echo ""
@@ -338,6 +317,32 @@ else
 	echo "<<<<<<<<            CONTINUAMOS CON LA INSTALACION DE ARCH              >>>>>>>>>>>>>"
 	echo "*************************************************************************************"
 	sleep 5
+	#(
+    #  echo g     # Crear una nueva tabla de particiones GPT
+    #  echo n     # Crear una nueva partición   --  Boot Bios GPT
+    #  echo       # Número de partición (por defecto: 1)
+    #  echo       # Primer sector (por defecto: primer sector disponible)
+    #  echo +100M # Último sector (+100M para la partición de /boot)
+	#  echo n     # Crear una nueva partición  --  Swap
+    #  echo       # Número de partición 
+    #  echo       # Primer sector (por defecto: primer sector disponible)
+    #  echo +2G  # partición del sistema swap
+    #  echo n     # Crear una nueva partición  -- root
+    #  echo       # Número de partición 
+    #  echo       # Primer sector (por defecto: primer sector disponible)
+    #  echo +35G  # partición del root
+    #  echo n     # Crear una nueva partición  -- home
+    #  echo       # Número de partición (por defecto: 3)
+    #  echo       # Primer sector (por defecto: primer sector disponible)
+    #  echo       # Último sector (por defecto: último sector disponible, usar todo el espacio restante)
+    #  echo t     # cambiar tipo de particion al boot
+    #  echo 1     # Nuemero de partición
+    #  echo 4     # Tipo de particion boot
+    #  echo t     # cambiar tipo de particion al swap
+    #  echo 2     # Nuemero de partición
+    #  echo 19    # Tipo de particion swap
+    #  echo w     # Guardar y salir
+    #) | fdisk ${disco}
 
 fi
 
