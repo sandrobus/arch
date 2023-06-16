@@ -137,8 +137,6 @@ read line
 	
  #uefi=$( ls /sys/firmware/efi/ | grep -ic efivars )
 
-elif
-
 if   [ $uefi == 1 ]
  then
 
@@ -218,6 +216,7 @@ if   [ $uefi == 1 ]
 	read line
 
 elif [ $uefi == 2 ]
+    then
 	clear
 	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
 	echo ""
@@ -293,10 +292,10 @@ elif [ $uefi == 2 ]
       mkswap $(cat swap-bios) 
 	  swapon $(cat swap-bios)
 	  mkfs.ext4 $(cat root-bios) 
-	  echo >>> pesione s para SI o Entrer para continuar <<<<
+	  echo ">>> pesione s para SI o Entrer para continuar <<<<"
 	  read line
       mkfs.ext4 $(cat home-bios)
-	  echo >>> pesione s para SI o Entrer para continuar <<<<
+	  echo ">>> pesione s para SI o Entrer para continuar <<<<"
 	  read line
       # Montar las particiones
       mount $(cat root-bios) /mnt 
@@ -311,39 +310,72 @@ elif [ $uefi == 2 ]
 	echo "********************************************************************************"
 	read line
 	
-else
+elif [ $uefi == 3 ]
+then
+
     echo "*************************************************************************************"
 	echo "<<<<<<<< SE DEFINIÓ MANUALMENTE EL PARTICIONAMIENTO Y PUNTOS DE MONTAJE >>>>>>>>>>>>>"
 	echo "<<<<<<<<            CONTINUAMOS CON LA INSTALACION DE ARCH              >>>>>>>>>>>>>"
 	echo "*************************************************************************************"
 	sleep 5
-	#(
-    #  echo g     # Crear una nueva tabla de particiones GPT
-    #  echo n     # Crear una nueva partición   --  Boot Bios GPT
-    #  echo       # Número de partición (por defecto: 1)
-    #  echo       # Primer sector (por defecto: primer sector disponible)
-    #  echo +100M # Último sector (+100M para la partición de /boot)
-	#  echo n     # Crear una nueva partición  --  Swap
-    #  echo       # Número de partición 
-    #  echo       # Primer sector (por defecto: primer sector disponible)
-    #  echo +2G  # partición del sistema swap
-    #  echo n     # Crear una nueva partición  -- root
-    #  echo       # Número de partición 
-    #  echo       # Primer sector (por defecto: primer sector disponible)
-    #  echo +35G  # partición del root
-    #  echo n     # Crear una nueva partición  -- home
-    #  echo       # Número de partición (por defecto: 3)
-    #  echo       # Primer sector (por defecto: primer sector disponible)
-    #  echo       # Último sector (por defecto: último sector disponible, usar todo el espacio restante)
-    #  echo t     # cambiar tipo de particion al boot
-    #  echo 1     # Nuemero de partición
-    #  echo 4     # Tipo de particion boot
-    #  echo t     # cambiar tipo de particion al swap
-    #  echo 2     # Nuemero de partición
-    #  echo 19    # Tipo de particion swap
-    #  echo w     # Guardar y salir
-    #) | fdisk ${disco}
-
+	(
+      echo g     # Crear una nueva tabla de particiones GPT
+      echo n     # Crear una nueva partición   --  Boot Bios GPT
+      echo       # Número de partición (por defecto: 1)
+      echo       # Primer sector (por defecto: primer sector disponible)
+      echo +100M # Último sector (+100M para la partición de /boot) (definimos tamaño con el simbolo + , el número y temnado en G =gigabytes o M=megabytes)
+	  sleep 4	#Este número son segundos de espera para rear el formato. este tiempo puede aumentar en disco mecanicos
+	  echo "PARTICION BOOT CREADA"
+	  echo n     # Crear una nueva partición  --  Swap
+      echo       # Número de partición (por defecto:SIGUIENTE PARTICION DISPONIBLE)
+      echo       # Primer sector (por defecto: primer sector disponible)
+      echo +8G  # partición del sistema swap (definimos tamaño con el simbolo + , el número y temnado en G =gigabytes o M=megabytes)
+	  sleep 4	#Este número son segundos de espera para rear el formato. este tiempo puede aumentar en disco mecanicos
+	  echo "PARTICION SWAP CREADA"
+      #echo n     # Crear una nueva partición  -- root
+      #echo       # Número de partición (por defecto:SIGUIENTE PARTICION DISPONIBLE)
+      #echo       # Primer sector (por defecto: primer sector disponible)
+      #echo +35G  # partición del root
+	  #sleep 4	  #Este número son segundos de espera para rear el formato. este tiempo puede aumentar en disco mecanicos
+	  #echo "PARTICION (ROOT/RAIZ) CREADA"
+	  echo n     # Crear una nueva partición  -- home
+      echo       # Número de partición (por defecto:SIGUIENTE PARTICION DISPONIBLE)
+      echo       # Primer sector (por defecto: primer sector disponible)
+      echo       # Último sector (por defecto: último sector disponible, usar todo el espacio restante)
+	  sleep 4	 #Este número son segundos de espera para rear el formato. este tiempo puede aumentar en disco mecanicos
+	  echo "PARTICION RESTANTE CREADA (ESPACIO LIBRE)"
+      echo t     # cambiar tipo de particion al boot
+      echo 1     # Nuemero de partición (<< 1 >> es la primera particon creada)
+      echo 4     # Tipo de particion boot (El número 4 es el asignado para >> Boot Partiion<< )
+	  sleep 2
+      echo t     # cambiar tipo de particion al swap
+      echo 2     # Nuemero de partición creada para el swap
+      echo 19    # Tipo de particion swap (El número 19 es el asignado para >> Boot Partiion<< !!VALIDAR DE NO FUNCIONAR¡¡¡)
+	  sleep 2
+      echo w     # Guardar y salir
+    ) | fdisk ${disco}
+	#echo "Formateando Particiones"	# Formateo de particiones
+     mkswap /dev/sda2             #formateando particion Swap
+	 swapon /dev/sda2             #Activando particion Swap
+	 mkfs.ext4 /dev/sda3          #formateando particion raiz
+	#  mkfs.ext4 /dev/sda4    #FORMATEO!!!  particion home
+	 mount /dev/sda3 /mnt       # Montar las particione Raiz en carpeta temporal mnt
+     mkdir /mnt/home            # Creando carpeta home en mnt
+     mount /dev/sdc1 /mnt/home  # Montar las particione HOME en carpeta mnt
+    
+	lsblk -l
+	echo ""
+	echo "********************************************************************************"
+	echo "<<<<<<<< Revise en punto de montaje en MOUNTPOINT - PRESIONE ENTER >>>>>>>>>>>>>"
+	echo "********************************************************************************"
+	read line
+else 
+ 
+    echo "<<<<<<<<                   OPCION ERRADA                           >>>>>>>>>>>>>"
+	echo "*************************************************************************************"
+	sleep 5
+	exit
+	
 fi
 
 # Actualización de llaves y mirroslist del LIVECD
