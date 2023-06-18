@@ -134,7 +134,29 @@ read line
     echo ""
 	echo "Seccionaste la opción: $uefi"
 	sleep 3
-	
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+# DETECTA SI NUESTRO SISTEMA ES UEFI O BIOS LEGACY
+	echo ""
+	echo "***********************************************************************************"
+	echo "<<<<<                DEFINIR BOOT : BIOS O UEFI                      >>>>>>>>>>>>>>"
+    echo "<<<<<                                                                >>>>>>>>>>>>>>"
+	echo "<<<<<          1. AUTOMATICA   (No sé que tipo de Boot Tengo)        >>>>>>>>>>>>>>"
+	echo "<<<<<          2. MANUAL       (Sé que tipo de Boot Tengo)           >>>>>>>>>>>>>>"
+	echo "<<<<<                                                                >>>>>>>>>>>>>>"
+	echo "***********************************************************************************"
+	read -p "Introduce la opción de particionado: " uefi
+    echo ""
+	echo "Seccionaste la opción: $uefi"
+	sleep 3
+
+if [ $uefi == 1 ]; then
+    uefi=$( ls /sys/firmware/efi/ | grep -ic efivars )
+else
+    uefi=$(3)
+fi
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
  #uefi=$( ls /sys/firmware/efi/ | grep -ic efivars )
 
 if   [ $uefi == 1 ]
@@ -621,26 +643,52 @@ clear
 	echo "*******************************************************************************"
 # Driver de Vídeo automatico solo driver Libres
 if (lspci | grep VGA | grep "NVIDIA\|nVidia" &>/dev/null); then
-#Nvidia
+    echo ""
+	echo "********************************************************************************"
+	echo "<<<<<<<<<<<<<<<<<< GPU NVIDIA\|nVidia R\|R2/R3/R4/R5   >>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "********************************************************************************"
+	echo ""
+    sleep 2
 arch-chroot /mnt /bin/bash -c "pacman -S xf86-video-nouveau mesa lib32-mesa mesa-vdpau libva-mesa-driver lib32-mesa-vdpau lib32-libva-mesa-driver libva-vdpau-driver libvdpau-va-gl libva-utils vdpauinfo libvdpau lib32-libvdpau opencl-mesa clinfo ocl-icd lib32-ocl-icd opencl-headers --noconfirm"
 
 elif (lspci | grep VGA | grep "Radeon R\|R2/R3/R4/R5" &>/dev/null); then
-# Radeon  
+    echo ""
+	echo "***********************************************************************************"
+	echo "<<<<<<<<<<<<<<<<<<<<< AMD/GPU Radeon R\|R2/R3/R4/R5   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "***********************************************************************************"
+	echo ""
+    sleep 2  
 arch-chroot /mnt /bin/bash -c "pacman -S xf86-video-amdgpu mesa lib32-mesa vulkan-radeon lib32-vulkan-radeon mesa-vdpau libva-mesa-driver lib32-mesa-vdpau lib32-libva-mesa-driver libva-vdpau-driver libvdpau-va-gl libva-utils vdpauinfo opencl-mesa clinfo ocl-icd lib32-ocl-icd opencl-headers --noconfirm"
 
 elif (lspci | grep VGA | grep "ATI\|AMD/ATI" &>/dev/null); then
-# ATI             
+    echo ""
+	echo "***********************************************************************************"
+	echo "<<<<<<<<<<<<<<<<<<<<<<   "VGA Integrado AMD / ATI"    >>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "***********************************************************************************"
+	echo ""
+    sleep 2           
 arch-chroot /mnt /bin/bash -c "pacman -S xf86-video-ati mesa lib32-mesa mesa-vdpau libva-mesa-driver lib32-mesa-vdpau lib32-libva-mesa-driver libva-vdpau-driver libvdpau-va-gl libva-utils vdpauinfo opencl-mesa clinfo ocl-icd lib32-ocl-icd opencl-headers --noconfirm"
 
 elif (lspci | grep VGA | grep "Intel" &>/dev/null); then
-# Intel       
+    echo ""
+	echo "*******************************************************************************"
+	echo "<<<<<<<<<<<<<<<<<<<<<<   "VGA Integrado Intel"    >>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "*******************************************************************************"
+	echo ""
+    sleep 2        
 arch-chroot /mnt /bin/bash -c "pacman -S xf86-video-intel vulkan-intel mesa lib32-mesa intel-media-driver libva-intel-driver libva-vdpau-driver libvdpau-va-gl libva-utils vdpauinfo intel-compute-runtime beignet clinfo ocl-icd lib32-ocl-icd opencl-headers --noconfirm"
     
 else
-# Generico   
+    echo ""
+	echo "***********************************************************************************"
+	echo "<<<<<<<<<<<<<<<<<<<<<<   "VGA Integrado Estandar"    >>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "**********************************************************************************"
+	echo ""
+    sleep 2   
 arch-chroot /mnt /bin/bash -c "pacman -S xf86-video-vesa xf86-video-fbdev mesa mesa-libgl lib32-mesa --noconfirm"
 
 fi
+sleep 3
 clear
 
 # Escritorio seleccionado
@@ -696,9 +744,6 @@ clear
 	arch-chroot /mnt /bin/bash -c "pacman -S gnu-free-fonts ttf-hack ttf-inconsolata gnome-font-viewer --noconfirm"
 clear
 
-	# Navegador Web
-	arch-chroot /mnt /bin/bash -c "pacman -S firefox --noconfirm"
-clear
 
   ;;
 
@@ -743,11 +788,7 @@ clear
 	arch-chroot /mnt /bin/bash -c "pacman -S gnu-free-fonts ttf-hack ttf-inconsolata gnome-font-viewer --noconfirm"
 	clear
 
-
-	# Navegador Web
-	arch-chroot /mnt /bin/bash -c "pacman -S firefox --noconfirm"
-	clear
-  ;;
+;;
 
   4)
     echo "Escritorio : Gnome 40"
@@ -805,7 +846,7 @@ esac
 	echo "                      <            PERSONALES              >"
 	echo "****************************************************************************************"
 	echo ""
-arch-chroot /mnt /bin/bash -c "yes | pacman -S --noconfirm libreoffice git wget neofetch lsb-release xdg-user-dirs gparted rhythmbox vscode plank psensor transmission-gtk kodi vlc"
+arch-chroot /mnt /bin/bash -c "yes | pacman -S --noconfirm firefox libreoffice xreader git wget neofetch lsb-release xdg-user-dirs gparted rhythmbox vscode plank psensor transmission-gtk kodi vlc"
 
     echo ""
 	echo "******************************************************************************"
