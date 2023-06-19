@@ -5,7 +5,7 @@ clear
 	echo "******************************************************************************"
 	echo "<<<<<<<<<<<<<<<<<<     "Creador Código Cristo"     >>>>>>>>>>>>>>>>>>>>>>>>>>>"
 	echo "<<<<<<<<<<<<<<<<<  "Sistema en español en liveCD"  >>>>>>>>>>>>>>>>>>>>>>>>>>>"
-	echo "<<<<<<<<<<<<<<  Verions GPT-BIOS GPT-UEFI 202306-1319 >>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "<<<<<<<<<<<<<<  Verions GPT-BIOS GPT-UEFI 202306-1819 >>>>>>>>>>>>>>>>>>>>>>>>"
 	echo "******************************************************************************"
 	echo ""
 #https://www.patreon.com/codigocristo
@@ -134,29 +134,7 @@ read line
     echo ""
 	echo "Seccionaste la opción: $uefi"
 	sleep 3
-#---------------------------------------------------------------------------------------------------
-#---------------------------------------------------------------------------------------------------
-# DETECTA SI NUESTRO SISTEMA ES UEFI O BIOS LEGACY
-	echo ""
-	echo "***********************************************************************************"
-	echo "<<<<<                DEFINIR BOOT : BIOS O UEFI                      >>>>>>>>>>>>>>"
-    echo "<<<<<                                                                >>>>>>>>>>>>>>"
-	echo "<<<<<          1. AUTOMATICA   (No sé que tipo de Boot Tengo)        >>>>>>>>>>>>>>"
-	echo "<<<<<          2. MANUAL       (Sé que tipo de Boot Tengo)           >>>>>>>>>>>>>>"
-	echo "<<<<<                                                                >>>>>>>>>>>>>>"
-	echo "***********************************************************************************"
-	read -p "Introduce la opción de particionado: " uefi
-    echo ""
-	echo "Seccionaste la opción: $uefi"
-	sleep 3
-
-if [ $uefi == 1 ]; then
-    uefi=$( ls /sys/firmware/efi/ | grep -ic efivars )
-else
-    uefi=$(3)
-fi
-#---------------------------------------------------------------------------------------------------
-#---------------------------------------------------------------------------------------------------
+	
  #uefi=$( ls /sys/firmware/efi/ | grep -ic efivars )
 
 if   [ $uefi == 1 ]
@@ -455,10 +433,14 @@ sed -i 's/#VerbosePkgLists/VerbosePkgLists/g' /mnt/etc/pacman.conf
 sed -i "37i ILoveCandy" /mnt/etc/pacman.conf
 sed -i 's/#[multilib]/[multilib]/g' /mnt/etc/pacman.conf
 sed -i "s/#Include = /etc/pacman.d/mirrorlist/Include = /etc/pacman.d/mirrorlist/g" /mnt/etc/pacman.conf
+
 clear
 
-# Hosts y Nombre de computador
-clear
+    echo ""
+	echo "******************************************************************************"
+	echo "<<<<<<<<<<<<<<< Hosts y Nombre de computador  >>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "******************************************************************************"
+	echo ""
 echo "$hostname" > /mnt/etc/hostname
 echo "127.0.1.1 $hostname.localdomain $hostname" > /mnt/etc/hosts
 clear
@@ -468,10 +450,9 @@ echo "Hosts: $(cat /mnt/etc/hosts)"
 echo ""
 clear
 
-# Agregando usuario y claves con administrador
     echo ""
 	echo "******************************************************************************"
-	echo "<<<<<<<<<<<<<<<  usuario y claves con administrador  >>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "<<<<<<<<<<<<  Agregando usuario y claves con administrador  >>>>>>>>>>>>>>>>>>>>>>>"
 	echo "******************************************************************************"
 	echo ""
 arch-chroot /mnt /bin/bash -c "(echo $rootpasswd ; echo $rootpasswd) | passwd root"
@@ -480,7 +461,6 @@ arch-chroot /mnt /bin/bash -c "(echo $userpasswd ; echo $userpasswd) | passwd $u
 sed -i "80i $user ALL=(ALL) ALL"  /mnt/etc/sudoers
 clear
 
-# Idioma del sistema
     echo ""
 	echo "******************************************************************************"
 	echo "<<<<<<<<<<<<<<<<<<       Idioma del sistema        >>>>>>>>>>>>>>>>>>>>>>>>>>>"
@@ -512,7 +492,6 @@ arch-chroot /mnt /bin/bash -c "locale-gen"
 sleep 3
 clear
 
-# Zona horaria Automatica
     echo ""
 	echo "******************************************************************************"
 	echo "<<<<<<<<<<<<<<<<<<     Zona horaria Automatica     >>>>>>>>>>>>>>>>>>>>>>>>>>>"
@@ -542,7 +521,6 @@ echo ""
 echo "Actualizando lista de MirrorList"
 echo ""
 arch-chroot /mnt /bin/bash -c "reflector --verbose --latest 15 --protocol http --protocol https --sort rate --save /etc/pacman.d/mirrorlist"
-clear
 cat /mnt/etc/pacman.d/mirrorlist
 sleep 3
 clear
@@ -555,12 +533,15 @@ clear
 	echo ""
 arch-chroot /mnt /bin/bash -c "pacman -S linux-firmware linux linux-headers mkinitcpio --noconfirm"
 clear
-
-# Instalación de GRUB - Arranque
+ 
+   
 if [ $uefi == 1 ]
 then
-
-clear
+    echo ""
+	echo "******************************************************************************"
+	echo "<<<<<<<<<<<<<  Instalación de GRUB - Arranque  UEFI  >>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "******************************************************************************"
+	echo ""
 arch-chroot /mnt /bin/bash -c "pacman -S grub efibootmgr os-prober dosfstools --noconfirm"
 echo '' 
 echo 'Instalando EFI System >> bootx64.efi' 
@@ -583,7 +564,11 @@ sleep 4
 
 else
 
-clear
+    echo ""
+	echo "******************************************************************************"
+	echo "<<<<<<<<<<<<<  Instalación de GRUB - Arranque  BIOS  >>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "******************************************************************************"
+	echo ""
 arch-chroot /mnt /bin/bash -c "pacman -S grub os-prober --noconfirm"
 echo '' 
 arch-chroot /mnt /bin/bash -c "grub-install --target=i386-pc $disco"
@@ -638,57 +623,46 @@ echo ""
 arch-chroot /mnt /bin/bash -c "ls /home/$user"
 sleep 3
 clear
-    echo "********A**********************************************************************"
+    echo "*******************************************************************************"
 	echo "<<<<<<<<<<<<<<<<<<<<<<<    Drivers de VGA o GPU   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 	echo "*******************************************************************************"
 # Driver de Vídeo automatico solo driver Libres
 if (lspci | grep VGA | grep "NVIDIA\|nVidia" &>/dev/null); then
-    echo ""
-	echo "********************************************************************************"
-	echo "<<<<<<<<<<<<<<<<<< GPU NVIDIA\|nVidia R\|R2/R3/R4/R5   >>>>>>>>>>>>>>>>>>>>>>>>>"
-	echo "********************************************************************************"
-	echo ""
-    sleep 2
+echo ""
+echo "<<<<<<<<<<<<<<<<<<<<<<<    Nvidia  GPU   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+echo ""
 arch-chroot /mnt /bin/bash -c "pacman -S xf86-video-nouveau mesa lib32-mesa mesa-vdpau libva-mesa-driver lib32-mesa-vdpau lib32-libva-mesa-driver libva-vdpau-driver libvdpau-va-gl libva-utils vdpauinfo libvdpau lib32-libvdpau opencl-mesa clinfo ocl-icd lib32-ocl-icd opencl-headers --noconfirm"
 
 elif (lspci | grep VGA | grep "Radeon R\|R2/R3/R4/R5" &>/dev/null); then
-    echo ""
-	echo "***********************************************************************************"
-	echo "<<<<<<<<<<<<<<<<<<<<< AMD/GPU Radeon R\|R2/R3/R4/R5   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-	echo "***********************************************************************************"
-	echo ""
-    sleep 2  
+
+echo ""
+echo "<<<<<<<<<<<<<<<<<<<<<<<    AND Radeon  GPU   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+echo "" 
 arch-chroot /mnt /bin/bash -c "pacman -S xf86-video-amdgpu mesa lib32-mesa vulkan-radeon lib32-vulkan-radeon mesa-vdpau libva-mesa-driver lib32-mesa-vdpau lib32-libva-mesa-driver libva-vdpau-driver libvdpau-va-gl libva-utils vdpauinfo opencl-mesa clinfo ocl-icd lib32-ocl-icd opencl-headers --noconfirm"
 
 elif (lspci | grep VGA | grep "ATI\|AMD/ATI" &>/dev/null); then
-    echo ""
-	echo "***********************************************************************************"
-	echo "<<<<<<<<<<<<<<<<<<<<<<   "VGA Integrado AMD / ATI"    >>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-	echo "***********************************************************************************"
-	echo ""
-    sleep 2           
+
+echo ""
+echo "<<<<<<<<<<<<<<<<<<<<<<<    AMD / ATI   VGA   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+echo ""
+
 arch-chroot /mnt /bin/bash -c "pacman -S xf86-video-ati mesa lib32-mesa mesa-vdpau libva-mesa-driver lib32-mesa-vdpau lib32-libva-mesa-driver libva-vdpau-driver libvdpau-va-gl libva-utils vdpauinfo opencl-mesa clinfo ocl-icd lib32-ocl-icd opencl-headers --noconfirm"
 
 elif (lspci | grep VGA | grep "Intel" &>/dev/null); then
-    echo ""
-	echo "*******************************************************************************"
-	echo "<<<<<<<<<<<<<<<<<<<<<<   "VGA Integrado Intel"    >>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-	echo "*******************************************************************************"
-	echo ""
-    sleep 2        
+#  
+echo ""
+echo "<<<<<<<<<<<<<<<<<<<<<<<    Intel VGA   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+echo ""      
 arch-chroot /mnt /bin/bash -c "pacman -S xf86-video-intel vulkan-intel mesa lib32-mesa intel-media-driver libva-intel-driver libva-vdpau-driver libvdpau-va-gl libva-utils vdpauinfo intel-compute-runtime beignet clinfo ocl-icd lib32-ocl-icd opencl-headers --noconfirm"
     
 else
-    echo ""
-	echo "***********************************************************************************"
-	echo "<<<<<<<<<<<<<<<<<<<<<<   "VGA Integrado Estandar"    >>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-	echo "**********************************************************************************"
-	echo ""
-    sleep 2   
+
+echo ""
+echo "<<<<<<<<<<<<<<<<<<<<<<<    Generico VGA   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+echo ""   
 arch-chroot /mnt /bin/bash -c "pacman -S xf86-video-vesa xf86-video-fbdev mesa mesa-libgl lib32-mesa --noconfirm"
 
 fi
-sleep 3
 clear
 
 # Escritorio seleccionado
@@ -744,7 +718,6 @@ clear
 	arch-chroot /mnt /bin/bash -c "pacman -S gnu-free-fonts ttf-hack ttf-inconsolata gnome-font-viewer --noconfirm"
 clear
 
-
   ;;
 
   3)
@@ -774,21 +747,18 @@ clear
 	sleep 5
 	clear
 
-
 	# Formatos de lectura de todo tipo de discos incluido android
-	#arch-chroot /mnt /bin/bash -c "pacman -S android-file-transfer android-tools android-udev msmtp libmtp libcddb gvfs gvfs-afc gvfs-smb gvfs-gphoto2 gvfs-mtp gvfs-goa gvfs-nfs gvfs-google dosfstools jfsutils f2fs-tools btrfs-progs exfat-utils ntfs-3g reiserfsprogs udftools xfsprogs nilfs-utils polkit gpart mtools --noconfirm"
-
+	arch-chroot /mnt /bin/bash -c "pacman -S android-file-transfer android-tools android-udev msmtp libmtp libcddb gvfs gvfs-afc gvfs-smb gvfs-gphoto2 gvfs-mtp gvfs-goa gvfs-nfs gvfs-google dosfstools jfsutils f2fs-tools btrfs-progs exfat-utils ntfs-3g reiserfsprogs udftools xfsprogs nilfs-utils polkit gpart mtools --noconfirm"
 
 	# Audio
 	arch-chroot /mnt /bin/bash -c "pacman -S pulseaudio pavucontrol --noconfirm"
 	clear
 
-
 	# Fonts
 	arch-chroot /mnt /bin/bash -c "pacman -S gnu-free-fonts ttf-hack ttf-inconsolata gnome-font-viewer --noconfirm"
 	clear
 
-;;
+  ;;
 
   4)
     echo "Escritorio : Gnome 40"
@@ -828,9 +798,6 @@ clear
 	arch-chroot /mnt /bin/bash -c "pacman -S gnu-free-fonts ttf-hack ttf-inconsolata gnome-font-viewer --noconfirm"
 	clear
 
-	# Navegador Web
-	arch-chroot /mnt /bin/bash -c "pacman -S firefox --noconfirm"
-	clear
   ;;
 
   *)
@@ -846,7 +813,7 @@ esac
 	echo "                      <            PERSONALES              >"
 	echo "****************************************************************************************"
 	echo ""
-arch-chroot /mnt /bin/bash -c "yes | pacman -S --noconfirm firefox libreoffice xreader git wget neofetch lsb-release xdg-user-dirs gparted rhythmbox vscode plank psensor transmission-gtk kodi vlc"
+        arch-chroot /mnt /bin/bash -c "yes | pacman -S --noconfirm firefox libreoffice xarchiver unrar p7zip zip unzip git wget neofetch lsb-release xdg-user-dirs gparted rhythmbox vscode plank psensor transmission-gtk kodi vlc"
 
     echo ""
 	echo "******************************************************************************"
@@ -856,35 +823,67 @@ arch-chroot /mnt /bin/bash -c "yes | pacman -S --noconfirm firefox libreoffice x
     sleep 5
 	clear
 
-#DESMONTAR Y REINICIAR
-umount -R /mnt
-swapoff -a
-echo ""
-echo "Visita: https://t.me/ArchLinuxCristo"
-echo ""
-echo "Apóyame en Patreon: "
-echo "https://www.patreon.com/codigocristo"
     echo ""
 	echo "********************************************************************************************"
-	echo ">>>>>>>>                     Terminamos, reinicioamos                 >>>>>>>>>>>>>>>>>>>>>>"
-	echo "<<<<<<<                                y                              >>>>>>>>>>>>>>>>>>>>>>"
-	echo ">>>>>>>>                debe retire el medio de inatlación            <<<<<<<<<<<<<<<<<<<<<<"
+	echo ">>>>>>>>         1. Salimos, después de reiniciar                     >>>>>>>>>>>>>>>>>>>>>>"
+	echo "<<<<<<<               y luego debemos retire el medio de inatlación   >>>>>>>>>>>>>>>>>>>>>>"
+	echo ">>>>>>>>         2. Instalar PAMAC All      						    <<<<<<<<<<<<<<<<<<<<<<"
+	echo "<<<<<<<               Soporte: AUR, Flatpak y Snap.	    			 >>>>>>>>>>>>>>>>>>>>>"
 	echo "********************************************************************************************"
 	echo ""
-    sleep 5
-reboot
+		read -p "Introduce la opción de particionado: " pamac
+    echo ""
+	echo "Seccionaste la opción: $pamac"
+	sleep 3
+if   [ $pamac == 2 ]
+ then
+       # Clonar yay desde el AUR
+       # hay que tener git instalado. Instalelo así:(sudo pacman -S git)
+       git clone https://aur.archlinux.org/yay.git
+       cd yay
+       echo ""       
+       echo "********************************************"
+       echo "******* Compilar e instalar yay  ***********"
+       echo "********************************************"
+	   echo ""
+       
+       yes | makepkg -si
+       
+       # Limpiar directorio después de la instalación
+       cd ..
+       rm -rf yay
+       
+       # Instalar pamac-all
+	   echo ""
+       echo "***************************************"
+       echo "****  Instalando Pamac-all  ***********"
+       echo "***************************************"
+	   echo ""
+       
+       # Instalar pamac-all con respuestas parametrizadas
+       echo "n" | yay -S --noconfirm pamac-all  # Respuesta "n" para la primera opción
+       echo "a" | yay -S --noconfirm pamac-all  # Respuesta "a" para la segunda opción
 
+else
 
+     echo "DESMONTAR Y REINICIAR"
+     umount -R /mnt
+     swapoff -a
+     echo ""
+     echo "Visita: https://t.me/ArchLinuxCristo"
+     echo ""
+     echo "Apóyame en Patreon: "
+	 echo ""
+     echo "https://www.patreon.com/codigocristo"
+	 echo ""
+	 echo "Colaboración: Sanbus"
+	 echo "https://github.com/sandrobus/arch"
+	 echo "sandrobust@gmail.com"
+	 
+fi
 
-
-
-
-
-
-
-
-
-
+     sleep 3
+	 exit
 #########################################################
 #
 # METODO DE DISCO PARA UEFI - BOOT - ROOT - HOME - SWAP 
@@ -957,10 +956,6 @@ reboot
 #	lsblk -l
 #	sleep 3
 #	clear
-
-
-
-
 
 
 #########################################################
