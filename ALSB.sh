@@ -1,24 +1,16 @@
 #!/bin/bash
-#Creador Código Cristo
-#https://www.patreon.com/codigocristo
-
-#Sistema en español en liveCD
-
-# El resultado de Curl aqui es: es-PE,qu,ay
-# curl https://ipapi.co/languages  
-
-# El resultado de Curl aqui es: es_PE.UTF8 UTF-8
-# curl https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF8 UTF-8|"
-
-# Lo cual vamos a guardar como variable para usarlo más adelante y en automatico
-
-echo  "<<<<<<<     Version     >>>>>>>>"
-echo  "<<<<<<<  202306-12-2231 >>>>>>>>"
-
+clear
+    echo ""
+	echo "******************************************************************************"
+	echo "<<<<<<<<<<<<<<<<<<        "Creador Sanbus"         >>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "<<<<<<<<<<<<<<<<<  "Sistema en español en liveCD"  >>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "<<<<<<<<<<<<<<  Verions GPT-BIOS GPT-UEFI 202306-1319 >>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "<<<<<<<<<<<<<<<<<<    "Colaboración Sanbus"        >>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "******************************************************************************"
+	echo ""
 idioma=$(curl https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF8|")
 echo ""
 echo "$idioma UTF-8" > /etc/locale.gen
-#echo "en_US UTF-8" > /etc/locale.gen
 locale-gen
 echo "LANG=$idioma" > /etc/locale.conf
 exportlang=$(echo "LANG=$idioma")
@@ -28,8 +20,7 @@ export $(cat /etc/locale.conf)
 locale-gen
 echo ""
 clear
-#Disco
-# discosdisponibles=$(lsblk -lno NAME,SIZE,TYPE | grep 'disk' | awk '{print "/dev/" $1 " " $2}' | sort -u)
+
 discosdisponibles=$(echo "print devices" | parted | grep /dev/ | awk '{if (NR!=1) {print}}' | sed '/sr/d')
 clear
 printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
@@ -39,11 +30,15 @@ echo ""
 echo $discosdisponibles
 echo ""
 printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
-# fdisk -l |  awk 'BEGIN{FS="bytes"","}{print $1} {print $2}' | grep ":" | sed '3d' | sed '4d' | sed '5d' | sed '3d'
+    echo ""
+	echo "******************************************************************************"
+	echo "<<<<<<<<<<<<<<<<     Ingresar Datos de personales       >>>>>>>>>>>>>>>>>>>>>>"
+	echo "******************************************************************************"
+	echo ""
 
-# Ingresar Datos de usuario
-echo ""
 read -p "Introduce tu disco a instalar Arch: " disco
+echo ""
+read -p "Introduce El nombre del PC: " hostname
 echo ""
 read -p "Introduce Nombre usuario Nuevo: " user
 echo ""
@@ -52,11 +47,13 @@ echo ""
 read -p "Introduce la clave de Root/Administrador: " rootpasswd
 echo ""
 
-# Escritorios
 printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
-echo ""
-echo "Ingresa una opción marcando el numero correcto: (1 - 2 - 3 - 4)"
-echo ""
+    echo ""
+	echo "******************************************************************************"
+	echo "<<<<<<<<<<<<<<<<<<     ENTORNO DE ESCRITORIO       >>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "<<< Ingresa una opción marcando el numero correcto: (1 - 2 - 3 - 4)  >>>>>>>>>"
+	echo "******************************************************************************"
+	echo ""
 echo "1. Terminal Virtual (TTY)"
 echo "2. Xfce4"
 echo "3. Kde Plasma"
@@ -67,15 +64,24 @@ echo ""
 
 # Mostrar datos guardados
 clear
+    echo ""
+	echo "******************************************************************************"
+	echo "<<<<<<<<<<<<<<<<<<              Resumen            >>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "******************************************************************************"
+	echo ""
 printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
 echo ''
 echo "Selección de Disco: $disco"
+echo ''
+echo "Nombre del PC: $hostname"
 echo ''
 echo "Tu usuario: $user"
 echo ''
 echo "Clave de usuario: $userpasswd"
 echo ''
 echo "Clave de Administrador: $rootpasswd"
+echo ''
+echo "Clave de Administrador: $escritorio"
 echo ''
 
 # Vemos que opción elige el usuario y realiza tal acción en este caso mostrar mensaje
@@ -107,19 +113,45 @@ echo "Para confirmar e instalar Arch Linux"
 echo ""
 echo "Presione ENTER o para salir presione CTRL + C"
 read line
-clear
-# DETECTA SI NUESTRO SISTEMA ES UEFI O BIOS GPT
 
-#uefi=$( ls /sys/firmware/efi/ | grep -ic efivars )
-echo "Presione 1 para Sistema es UEFI"
+
+#---------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+# DETECTA SI NUESTRO SISTEMA ES UEFI O BIOS LEGACY
+	echo ""
+	echo "***********************************************************************************"
+	echo "<<<<<         DEFINIR BOOT del Disco : BIOS O UEFI                   >>>>>>>>>>>>>>"
+    echo "<<<<<                                                                >>>>>>>>>>>>>>"
+	echo "<<<<<          1. AUTOMATICA   (No sé que tipo de Boot Tengo)        >>>>>>>>>>>>>>"
+	echo "<<<<<          2. MANUAL       (Sé que tipo de Boot Tengo)           >>>>>>>>>>>>>>"
+	echo "<<<<<                                                                >>>>>>>>>>>>>>"
+	echo "***********************************************************************************"
+	read -p "Introduce la opción de particionado: " uefibios
+    echo ""
+	echo "Seccionaste la opción: $uefibios"
+	sleep 2
+
+if [ $uefibios == 1 ]; then
+    uefi=$( ls /sys/firmware/efi/ | grep -ic efivars )
+else
 echo ""
-echo "Presione 2 para BIOS-LEGACY"
-uefi=$(read line)
-#uefi=0
-clear
+	echo "******************************************************************************"
+	echo "<<<<<              SELECCIÓN MANUAL                             >>>>>>>>>>>>>>"
+	echo "<<<<<       GPT en BIOS Lagcy          PRESIONE 0               >>>>>>>>>>>>>>"
+	echo "<<<<<       GPT en UEFI                PRESIONE 1               >>>>>>>>>>>>>>"
+	echo "<<<<<       PREVIA PARTICION MANUAL    PRESIONE 2               >>>>>>>>>>>>>>"
+	echo "<<<<<                                                           >>>>>>>>>>>>>>"
+	echo "******************************************************************************"
+	read -p "Introduce la opción de particionado: " uefi
+    echo ""
+	echo "Seccionaste la opción: $uefi"
+	sleep 3
+   	
+fi
 
-if [ $uefi == 1 ]
-then
+if   [ $uefi == 1 ]
+ then
+
 	clear
 	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
 	echo ""
@@ -195,59 +227,49 @@ then
 	lsblk -l
 	read line
 
-
-else
+elif [ $uefi == 0 ]
+    then
 	clear
 	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
 	echo ""
-	echo "Tu Sistema es BIOS-LEGACY"
+	echo "******************************************************************************"
+	echo "<<<<<              PARTICIONAMIENTO DE DISCO                    >>>>>>>>>>>>>>"
+	echo "<<<<<        Tabla de Particion GPT en BIOS Lagcy               >>>>>>>>>>>>>>"
+	echo "******************************************************************************"
 	echo ""
 	date "+%F %H:%M"
-	sleep 1
-	#Fuente: https://wiki.archlinux.org/index.php/GPT_fdisk
+	swapsize=$(free --giga | awk '/^Mem:/{print $2}')
 
-	#Metodo con EFI - SWAP - ROOT - HOME
-	#+100M 			tamaño particion boot
-	#+${swapsize}G  tamaño particion swap
-	#0				tamaño particion root 100%
-	#				Cambien valores si desean
-
-	# Esta variable pone la misma cantidad de Gib que tenemos en ram fisica
-	# free --giga | awk '/^Mem:/{print $2}'
-
-	#swapsize=$(free --giga | awk '/^Mem:/{print $2}')
-	echo "Establesca el tamaño del Boot (Partición 1 en Megas MB)"
-    partboot=$(read line)
-    echo "Establesca el tamaño del Swap (Partición 2 en Gigas GB)"
-    swapsize=$(read line)
-    echo "Establesca el tamaño de la Raiz o Root (Partición 3 en Gigas GB)"
-    raizsize=$(read line)
-    echo "Establesca el tamaño de Home (Partición 4 Gigas GB restantes)"
-    sleep 5
-	echo "las particiones quedaron de la siguiete forma:"
-	echo "boot: ${partboot}M"
-	echo "Swap: ${swapsize}G"
-	echo "Raiz: ${raizsize}G"
-	echo "Home: Resto del disco"
-	#dd if=/dev/zero of="${disco}" bs=4M conv=fsync oflag=direct status=progress
-	(echo Ignore) | sgdisk --zap-all ${disco}
-	#parted ${disco} mklabel gpt
-	(echo 2; echo w; echo Y) | gdisk ${disco}
-	sgdisk ${disco} -n=1:0:+${partboot}M -t=1:ef02
-	sgdisk ${disco} -n=2:0:+${swapsize}G -t=2:8200
-	sgdisk ${disco} -n=3:0:+${raizsize}G -t=2:8300
-	sgdisk ${disco} -n=4:0:0
-	fdisk -l ${disco} > /tmp/partition
-	echo ""
+    sgdisk --zap-all ${disco} #borra todas las particiones
+	
+		sgdisk ${disco} -n=1:0:+100M -t=1:ef02
+	sleep 5
+	fdisk -l
+		sgdisk ${disco} -n=2:0:+${swapsize}G -t=2:8200
+	sleep 5
+	clear
+	fdisk -l
+		sgdisk ${disco} -n=3:0:+77G  -t=2:8300
+	sleep 5
+	clear
+	fdisk -l
+		sgdisk ${disco} -n=4:0:0
+	sleep 5
+	clear
+	fdisk -l
+		fdisk -l ${disco} > /tmp/partition 
 	cat /tmp/partition
+	echo ""
 	sleep 3
-
+	lsblk
+	echo "Revise en punto de montaje en MOUNTPOINT - PRESIONE ENTER"
+    read line
 	partition="$(cat /tmp/partition | grep /dev/ | awk '{if (NR!=1) {print}}' | sed 's/*//g' | awk -F ' ' '{print $1}')"
 
 	echo $partition | awk -F ' ' '{print $1}' >  boot-bios
 	echo $partition | awk -F ' ' '{print $2}' >  swap-bios
-	echo $partition | awk -F ' ' '{print $3}' >  root-bios
-	echo $partition | awk -F ' ' '{print $4}' >  home-bios
+    echo $partition | awk -F ' ' '{print $3}' >  root-bios
+    echo $partition | awk -F ' ' '{print $4}' >  home-bios
 
 	clear
 	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
@@ -260,45 +282,110 @@ else
 	echo ""
 	echo "Partición ROOT es:"
 	cat root-bios
-	echo "Partición HOME es:"
+    echo ""
+    echo "Partición HOME es:"
 	cat home-bios
 	sleep 3
 
 	clear
 	echo ""
-	echo "Formateando Particiones"
-	echo ""
-	mkfs.ext4 $(cat root-bios) 
-	mount $(cat root-bios) /mnt
-
-	mkfs.ext4 $(cat home-bios) 
-	mkdir -p /mnt/home
-	mount $(cat home-bios) /mnt/home 
-
-	mkdir -p /mnt/boot
-	mkfs.ext4 $(cat boot-bios) 
-	mount $(cat boot-bios) /mnt/boot
-
-	mkswap $(cat swap-bios) 
-	swapon $(cat swap-bios)
-
-	rm boot-bios
-	rm swap-bios
-	rm root-bios
-	rm home-bios
-
+	echo "Formateando Particiones"	# Formateo de particiones
+      mkswap $(cat swap-bios)
+	  	sleep 2
+	  swapon $(cat swap-bios)
+	  sleep 2
+	  mkfs.ext4 $(cat root-bios) 
+	    sleep 2
+	  echo ">>> pesione s para SI o Entrer para continuar <<<<"
+	  read line
+      mkfs.ext4 $(cat home-bios)
+	    sleep 2
+	  echo ">>> pesione s para SI o Entrer para continuar <<<<"
+	  read line
+      # Montar las particiones
+      mount $(cat root-bios) /mnt 
+	    sleep 2
+      mkdir /mnt/home
+      mount $(cat home-bios) /mnt/home
+    
 	clear
-	echo ""
-	echo "Revise en punto de montaje en MOUNTPOINT - PRESIONE ENTER"
 	echo ""
 	lsblk -l
+	echo "********************************************************************************"
+	echo "<<<<<<<< Revise en punto de montaje en MOUNTPOINT - PRESIONE ENTER >>>>>>>>>>>>>"
+	echo "********************************************************************************"
 	read line
-	sleep 4
-	clear
+	
+elif [ $uefi == 2 ]
+then
+
+    echo "*************************************************************************************"
+	echo "<<<<<<<< SE DEFINIÓ MANUALMENTE EL PARTICIONAMIENTO Y PUNTOS DE MONTAJE >>>>>>>>>>>>>"
+	echo "<<<<<<<<            CONTINUAMOS CON LA INSTALACION DE ARCH              >>>>>>>>>>>>>"
+	echo "*************************************************************************************"
+	sleep 5
+	(
+      echo g     # Crear una nueva tabla de particiones GPT
+      echo n     # Crear una nueva partición   --  Boot Bios GPT
+      echo       # Número de partición (por defecto: 1)
+      echo       # Primer sector (por defecto: primer sector disponible)
+      echo +100M # Último sector (+100M para la partición de /boot) (definimos tamaño con el simbolo + , el número y temnado en G =gigabytes o M=megabytes)
+	  sleep 4	#Este número son segundos de espera para rear el formato. este tiempo puede aumentar en disco mecanicos
+	  echo "PARTICION BOOT CREADA"
+	  echo n     # Crear una nueva partición  --  Swap
+      echo       # Número de partición (por defecto:SIGUIENTE PARTICION DISPONIBLE)
+      echo       # Primer sector (por defecto: primer sector disponible)
+      echo +8G  # partición del sistema swap (definimos tamaño con el simbolo + , el número y temnado en G =gigabytes o M=megabytes)
+	  sleep 4	#Este número son segundos de espera para rear el formato. este tiempo puede aumentar en disco mecanicos
+	  echo "PARTICION SWAP CREADA"
+      echo n     # Crear una nueva partición  -- root
+      echo       # Número de partición (por defecto:SIGUIENTE PARTICION DISPONIBLE)
+      echo       # Primer sector (por defecto: primer sector disponible)
+      echo +77G  # partición del root
+	  sleep 4	  #Este número son segundos de espera para rear el formato. este tiempo puede aumentar en disco mecanicos
+	  echo "PARTICION (ROOT/RAIZ) CREADA"
+	  echo n     # Crear una nueva partición  -- home
+      echo       # Número de partición (por defecto:SIGUIENTE PARTICION DISPONIBLE)
+      echo       # Primer sector (por defecto: primer sector disponible)
+      echo       # Último sector (por defecto: último sector disponible, usar todo el espacio restante)
+	  sleep 4	 #Este número son segundos de espera para rear el formato. este tiempo puede aumentar en disco mecanicos
+	  echo "PARTICION RESTANTE CREADA (ESPACIO LIBRE)"
+      echo t     # cambiar tipo de particion al boot
+      echo 1     # Nuemero de partición (<< 1 >> es la primera particon creada)
+      echo 4     # Tipo de particion boot (El número 4 es el asignado para >> Boot Partiion<< )
+	  sleep 2
+      echo t     # cambiar tipo de particion al swap
+      echo 2     # Nuemero de partición creada para el swap
+      echo 19    # Tipo de particion swap (El número 19 es el asignado para >> Boot Partiion<< !!VALIDAR DE NO FUNCIONAR¡¡¡)
+	  sleep 2
+      echo w     # Guardar y salir
+	  sleep 2
+    ) | fdisk ${disco}
+	#echo "Formateando Particiones"	# Formateo de particiones
+     mkswap /dev/sda2             #formateando particion Swap
+	 sleep 2
+	 swapon /dev/sda2             #Activando particion Swap
+	 sleep 2
+	 mkfs.ext4 /dev/sda3          #formateando particion raiz
+	#  mkfs.ext4 /dev/sda4    #FORMATEO!!!  particion home
+	 mount /dev/sda3 /mnt       # Montar las particione Raiz en carpeta temporal mnt
+     mkdir /mnt/home            # Creando carpeta home en mnt
+     mount /dev/sdc1 /mnt/home  # Montar las particione HOME en carpeta mnt
+    
+	lsblk -l
+	echo ""
+	echo "********************************************************************************"
+	echo "<<<<<<<< Revise en punto de montaje en MOUNTPOINT - PRESIONE ENTER >>>>>>>>>>>>>"
+	echo "********************************************************************************"
+	read line
+else 
+ 
+    echo "<<<<<<<<                   OPCION ERRADA                           >>>>>>>>>>>>>"
+	echo "*************************************************************************************"
+	sleep 5
+	exit
 	
 fi
-
-
 
 # Actualización de llaves y mirroslist del LIVECD
 clear
@@ -317,16 +404,19 @@ cat /etc/pacman.d/mirrorlist
 sleep 3
 clear
 
-
 # Instalando Sistema base en nuestro Disco
-echo ""
-echo "Instalando Sistema base"
-echo ""
+    echo "********************************************************************************"
+    echo ">>>>>>>>>>>>>>>>>>>>>>>   Instalando Sistema base   >>>>>>>>>>>>>>>>>>><>>>>>>>>"
+    echo "********************************************************************************"
 pacstrap /mnt base base-devel nano reflector python rsync
 clear
 
-
 # Creando Archiv FSTAB para detectar al iniciar el sistema
+    echo ""
+	echo "******************************************************************************"
+	echo "<<<<<  Creando Archiv FSTAB para detectar al iniciar el sistema >>>>>>>>>>>>>>"
+	echo "******************************************************************************"
+	echo ""
 echo ""
 echo "Archivo FSTAB"
 echo ""
@@ -337,8 +427,12 @@ cat /mnt/etc/fstab
 sleep 4
 clear
 
-
 # Configurando pacman para que tenga colores con el repo de MultiLib
+    echo ""
+	echo "******************************************************************************"
+	echo "<<<<<<<<<<<<<   Pacman colores y repo de MultiLib   >>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "******************************************************************************"
+	echo ""
 sed -i 's/#Color/Color/g' /mnt/etc/pacman.conf
 sed -i 's/#TotalDownload/TotalDownload/g' /mnt/etc/pacman.conf
 sed -i 's/#VerbosePkgLists/VerbosePkgLists/g' /mnt/etc/pacman.conf
@@ -347,10 +441,8 @@ sed -i 's/#[multilib]/[multilib]/g' /mnt/etc/pacman.conf
 sed -i "s/#Include = /etc/pacman.d/mirrorlist/Include = /etc/pacman.d/mirrorlist/g" /mnt/etc/pacman.conf
 clear
 
-
-#Hosts y Nombre de computador
+# Hosts y Nombre de computador
 clear
-hostname=SanbusPC
 echo "$hostname" > /mnt/etc/hostname
 echo "127.0.1.1 $hostname.localdomain $hostname" > /mnt/etc/hosts
 clear
@@ -360,16 +452,23 @@ echo "Hosts: $(cat /mnt/etc/hosts)"
 echo ""
 clear
 
-
 # Agregando usuario y claves con administrador
+    echo ""
+	echo "******************************************************************************"
+	echo "<<<<<<<<<<<<<<<  usuario y claves con administrador  >>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "******************************************************************************"
+	echo ""
 arch-chroot /mnt /bin/bash -c "(echo $rootpasswd ; echo $rootpasswd) | passwd root"
 arch-chroot /mnt /bin/bash -c "useradd -m -g users -s /bin/bash $user"
 arch-chroot /mnt /bin/bash -c "(echo $userpasswd ; echo $userpasswd) | passwd $user"
 sed -i "80i $user ALL=(ALL) ALL"  /mnt/etc/sudoers
 clear
 
-
-# Idioma del sistema
+    echo ""
+	echo "******************************************************************************"
+	echo "<<<<<<<<<<<<<<<<<<       Idioma del sistema        >>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "******************************************************************************"
+	echo ""
 printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
 echo -e ""
 echo -e "\t\t\t| Idioma del Sistema |"
@@ -393,11 +492,14 @@ export $exportlang
 export LANG=$idioma
 locale-gen
 arch-chroot /mnt /bin/bash -c "locale-gen" 
-clear
 sleep 3
+clear
 
-
-# Zona horaria Automatica
+    echo ""
+	echo "******************************************************************************"
+	echo "<<<<<<<<<<<<<<<<<<     Zona horaria Automatica     >>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "******************************************************************************"
+	echo ""
 arch-chroot /mnt /bin/bash -c "pacman -Sy curl --noconfirm"
 curl https://ipapi.co/timezone > zonahoraria
 zonahoraria=$(cat zonahoraria)
@@ -410,14 +512,12 @@ sleep 3
 rm zonahoraria
 clear
 
-
 # Establecer un mapa de teclado para la terminal virtual
 curl https://ipapi.co/languages | awk -F "," '{print $1}' | sed -e's/.$//' | sed -e's/.$//' | sed -e's/.$//' > keymap
 keymap=$(cat keymap)
 echo "KEYMAP=$keymap" > /mnt/etc/vconsole.conf 
 cat /mnt/etc/vconsole.conf 
 clear
-
 
 # Actualiza lista de mirrors en tu disco
 echo ""
@@ -429,13 +529,19 @@ cat /mnt/etc/pacman.d/mirrorlist
 sleep 3
 clear
 
-
-# Instalación del kernel stable
+    echo ""
+	echo "******************************************************************************"
+	echo "<<<<<<<<<<<<<<<<<<  Instalación del kernel stable  >>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "******************************************************************************"
+	echo ""
 arch-chroot /mnt /bin/bash -c "pacman -S linux-firmware linux linux-headers mkinitcpio --noconfirm"
 clear
 
-
-# Instalación de GRUB - Arranque
+    echo ""
+	echo "******************************************************************************"
+	echo "<<<<<<<<<<<<<<<<<<  Instalación de GRUB - Arranque  >>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "******************************************************************************"
+	echo ""
 if [ $uefi == 1 ]
 then
 
@@ -447,10 +553,8 @@ arch-chroot /mnt /bin/bash -c 'grub-install --target=x86_64-efi --efi-directory=
 echo '' 
 echo 'Instalando UEFI System >> grubx64.efi' 
 arch-chroot /mnt /bin/bash -c 'grub-install --target=x86_64-efi --efi-directory=/efi --bootloader-id=Arch'
-######
 sed -i "6iGRUB_CMDLINE_LINUX_DEFAULT="loglevel=3"" /mnt/etc/default/grub
 sed -i '7d' /mnt/etc/default/grub
-######
 echo ''
 arch-chroot /mnt /bin/bash -c "grub-mkconfig -o /boot/grub/grub.cfg"
 echo '' 
@@ -468,10 +572,8 @@ clear
 arch-chroot /mnt /bin/bash -c "pacman -S grub os-prober --noconfirm"
 echo '' 
 arch-chroot /mnt /bin/bash -c "grub-install --target=i386-pc $disco"
-######
 sed -i "6iGRUB_CMDLINE_LINUX_DEFAULT="loglevel=3"" /mnt/etc/default/grub
 sed -i '7d' /mnt/etc/default/grub
-######
 echo ''
 arch-chroot /mnt /bin/bash -c "grub-mkconfig -o /boot/grub/grub.cfg"
 echo '' 
@@ -483,69 +585,87 @@ echo '> Confirme tener las IMG de linux para el arranque'
 echo '> Confirme tener la carpeta de GRUB para el arranque' 
 
 fi
-
 clear
 
-
-# Ethernet
+    echo ""
+	echo "******************************************************************************"
+	echo "<<<<<<<<<<<<<<<<<<<<<<       "Ethernet"          >>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "******************************************************************************"
+	echo ""
 arch-chroot /mnt /bin/bash -c "pacman -S dhcpcd networkmanager iwd net-tools ifplugd --noconfirm"
 arch-chroot /mnt /bin/bash -c "systemctl enable dhcpcd NetworkManager"
 echo "noipv6rs" >> /mnt/etc/dhcpcd.conf
 echo "noipv6" >> /mnt/etc/dhcpcd.conf
-clear
-
-
 # Wifi
-#arch-chroot /mnt /bin/bash -c "pacman -S iw wireless_tools wpa_supplicant dialog wireless-regdb --noconfirm"
+arch-chroot /mnt /bin/bash -c "pacman -S iw wireless_tools wpa_supplicant dialog wireless-regdb --noconfirm"
 
-
-# Bluutuuu
+# Bluetoot
 #arch-chroot /mnt /bin/bash -c "pacman -S bluez bluez-utils pulseaudio-bluetooth"
 
-
-# Shell del sistema
-arch-chroot /mnt /bin/bash -c "pacman -S zsh zsh-completions zsh-syntax-highlighting zsh-autosuggestions --noconfirm"
-SH=zsh
-arch-chroot /mnt /bin/bash -c "chsh -s /bin/$SH"
-arch-chroot /mnt /bin/bash -c "chsh -s /usr/bin/$SH $user"
-arch-chroot /mnt /bin/bash -c "chsh -s /bin/$SH $user"
 clear
 
-
-# Directorios del sistema
-arch-chroot /mnt /bin/bash -c "pacman -S git wget neofetch lsb-release xdg-user-dirs --noconfirm"
+    echo ""
+	echo "******************************************************************************"
+	echo "<<<<<<<<<<             Directorios del sistema                   >>>>>>>>>>>>>"
+	echo "******************************************************************************"
+	echo ""
 arch-chroot /mnt /bin/bash -c "xdg-user-dirs-update"
 echo ""
 arch-chroot /mnt /bin/bash -c "ls /home/$user"
-sleep 5
+sleep 3
 clear
-
-
+    echo "********A**********************************************************************"
+	echo "<<<<<<<<<<<<<<<<<<<<<<<    Drivers de VGA o GPU   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "*******************************************************************************"
 # Driver de Vídeo automatico solo driver Libres
 if (lspci | grep VGA | grep "NVIDIA\|nVidia" &>/dev/null); then
-#Nvidia
+    echo ""
+	echo "********************************************************************************"
+	echo "<<<<<<<<<<<<<<<<<< GPU NVIDIA\|nVidia R\|R2/R3/R4/R5   >>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "********************************************************************************"
+	echo ""
+    sleep 2
 arch-chroot /mnt /bin/bash -c "pacman -S xf86-video-nouveau mesa lib32-mesa mesa-vdpau libva-mesa-driver lib32-mesa-vdpau lib32-libva-mesa-driver libva-vdpau-driver libvdpau-va-gl libva-utils vdpauinfo libvdpau lib32-libvdpau opencl-mesa clinfo ocl-icd lib32-ocl-icd opencl-headers --noconfirm"
 
 elif (lspci | grep VGA | grep "Radeon R\|R2/R3/R4/R5" &>/dev/null); then
-# Radeon  
+    echo ""
+	echo "***********************************************************************************"
+	echo "<<<<<<<<<<<<<<<<<<<<< AMD/GPU Radeon R\|R2/R3/R4/R5   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "***********************************************************************************"
+	echo ""
+    sleep 2  
 arch-chroot /mnt /bin/bash -c "pacman -S xf86-video-amdgpu mesa lib32-mesa vulkan-radeon lib32-vulkan-radeon mesa-vdpau libva-mesa-driver lib32-mesa-vdpau lib32-libva-mesa-driver libva-vdpau-driver libvdpau-va-gl libva-utils vdpauinfo opencl-mesa clinfo ocl-icd lib32-ocl-icd opencl-headers --noconfirm"
 
 elif (lspci | grep VGA | grep "ATI\|AMD/ATI" &>/dev/null); then
-# ATI             
+    echo ""
+	echo "***********************************************************************************"
+	echo "<<<<<<<<<<<<<<<<<<<<<<   "VGA Integrado AMD / ATI"    >>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "***********************************************************************************"
+	echo ""
+    sleep 2           
 arch-chroot /mnt /bin/bash -c "pacman -S xf86-video-ati mesa lib32-mesa mesa-vdpau libva-mesa-driver lib32-mesa-vdpau lib32-libva-mesa-driver libva-vdpau-driver libvdpau-va-gl libva-utils vdpauinfo opencl-mesa clinfo ocl-icd lib32-ocl-icd opencl-headers --noconfirm"
 
 elif (lspci | grep VGA | grep "Intel" &>/dev/null); then
-# Intel       
+    echo ""
+	echo "*******************************************************************************"
+	echo "<<<<<<<<<<<<<<<<<<<<<<   "VGA Integrado Intel"    >>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "*******************************************************************************"
+	echo ""
+    sleep 2        
 arch-chroot /mnt /bin/bash -c "pacman -S xf86-video-intel vulkan-intel mesa lib32-mesa intel-media-driver libva-intel-driver libva-vdpau-driver libvdpau-va-gl libva-utils vdpauinfo intel-compute-runtime beignet clinfo ocl-icd lib32-ocl-icd opencl-headers --noconfirm"
     
 else
-# Generico   
+    echo ""
+	echo "***********************************************************************************"
+	echo "<<<<<<<<<<<<<<<<<<<<<<   "VGA Integrado Estandar"    >>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "**********************************************************************************"
+	echo ""
+    sleep 2   
 arch-chroot /mnt /bin/bash -c "pacman -S xf86-video-vesa xf86-video-fbdev mesa mesa-libgl lib32-mesa --noconfirm"
 
 fi
-
+sleep 3
 clear
-
 
 # Escritorio seleccionado
 case $escritorio in
@@ -556,24 +676,28 @@ case $escritorio in
   ;;
 
   2)
-    echo "Escritorio : Xfce4"
-    sleep 3
+    echo ""
+	echo "*******************************************************************************"
+	echo "<<<<<<<<<<<<<<<<<<<<<<<   "Escritorio : Xfce4"    >>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "*******************************************************************************"
+	echo ""
+    sleep 2
 
     # Instala Xorg
 	arch-chroot /mnt /bin/bash -c "pacman -S xorg xorg-apps xorg-xinit xorg-twm xterm xorg-xclock --noconfirm"
-
+clear
     # Programas de Xfce4
     arch-chroot /mnt /bin/bash -c "pacman -S xfce4 xfce4-goodies network-manager-applet ffmpegthumbs ffmpegthumbnailer --noconfirm"
-	
+clear	
 	# Programas para Login
 	arch-chroot /mnt /bin/bash -c "pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings light-locker accountsservice --noconfirm"
 	arch-chroot /mnt /bin/bash -c "systemctl enable lightdm"
-
+clear
 	# Establecer formato de teclado dentro de Xorg
 	keymap="latam"
 	# Aqui podemos ponerlo en " latam - es - us " 
 	# Algún otro idioma que queremos para nuestro teclado mi caso es : latam
-
+clear
 	touch /mnt/etc/X11/xorg.conf.d/00-keyboard.conf
 	echo -e 'Section "InputClass"' > /mnt/etc/X11/xorg.conf.d/00-keyboard.conf
 	echo -e 'Identifier "system-keyboard"' >> /mnt/etc/X11/xorg.conf.d/00-keyboard.conf
@@ -583,26 +707,19 @@ case $escritorio in
 	echo ""
 	cat /mnt/etc/X11/xorg.conf.d/00-keyboard.conf
 	sleep 5
-	clear
-
+clear
 
 	# Formatos de lectura de todo tipo de discos incluido android
-	#arch-chroot /mnt /bin/bash -c "pacman -S android-file-transfer android-tools android-udev msmtp libmtp libcddb gvfs gvfs-afc gvfs-smb gvfs-gphoto2 gvfs-mtp gvfs-goa gvfs-nfs gvfs-google dosfstools jfsutils f2fs-tools btrfs-progs exfat-utils ntfs-3g reiserfsprogs udftools xfsprogs nilfs-utils polkit gpart mtools --noconfirm"
-
-
+	arch-chroot /mnt /bin/bash -c "pacman -S android-file-transfer android-tools android-udev msmtp libmtp libcddb gvfs gvfs-afc gvfs-smb gvfs-gphoto2 gvfs-mtp gvfs-goa gvfs-nfs gvfs-google dosfstools jfsutils f2fs-tools btrfs-progs exfat-utils ntfs-3g reiserfsprogs udftools xfsprogs nilfs-utils polkit gpart mtools --noconfirm"
+clear
 	# Audio
 	arch-chroot /mnt /bin/bash -c "pacman -S pulseaudio pavucontrol --noconfirm"
-	clear
-
+clear
 
 	# Fonts
 	arch-chroot /mnt /bin/bash -c "pacman -S gnu-free-fonts ttf-hack ttf-inconsolata gnome-font-viewer --noconfirm"
-	clear
+clear
 
-
-	# Navegador Web
-	arch-chroot /mnt /bin/bash -c "pacman -S firefox --noconfirm"
-	clear
   ;;
 
   3)
@@ -632,25 +749,18 @@ case $escritorio in
 	sleep 5
 	clear
 
-
 	# Formatos de lectura de todo tipo de discos incluido android
 	#arch-chroot /mnt /bin/bash -c "pacman -S android-file-transfer android-tools android-udev msmtp libmtp libcddb gvfs gvfs-afc gvfs-smb gvfs-gphoto2 gvfs-mtp gvfs-goa gvfs-nfs gvfs-google dosfstools jfsutils f2fs-tools btrfs-progs exfat-utils ntfs-3g reiserfsprogs udftools xfsprogs nilfs-utils polkit gpart mtools --noconfirm"
-
 
 	# Audio
 	arch-chroot /mnt /bin/bash -c "pacman -S pulseaudio pavucontrol --noconfirm"
 	clear
 
-
 	# Fonts
 	arch-chroot /mnt /bin/bash -c "pacman -S gnu-free-fonts ttf-hack ttf-inconsolata gnome-font-viewer --noconfirm"
 	clear
 
-
-	# Navegador Web
-	arch-chroot /mnt /bin/bash -c "pacman -S firefox --noconfirm"
-	clear
-  ;;
+;;
 
   4)
     echo "Escritorio : Gnome 40"
@@ -679,20 +789,16 @@ case $escritorio in
 	sleep 5
 	clear
 
-
 	# Formatos de lectura de todo tipo de discos incluido android
-	#arch-chroot /mnt /bin/bash -c "pacman -S android-file-transfer android-tools android-udev msmtp libmtp libcddb gvfs gvfs-afc gvfs-smb gvfs-gphoto2 gvfs-mtp gvfs-goa gvfs-nfs gvfs-google dosfstools jfsutils f2fs-tools btrfs-progs exfat-utils ntfs-3g reiserfsprogs udftools xfsprogs nilfs-utils polkit gpart mtools --noconfirm"
-
+	arch-chroot /mnt /bin/bash -c "pacman -S android-file-transfer android-tools android-udev msmtp libmtp libcddb gvfs gvfs-afc gvfs-smb gvfs-gphoto2 gvfs-mtp gvfs-goa gvfs-nfs gvfs-google dosfstools jfsutils f2fs-tools btrfs-progs exfat-utils ntfs-3g reiserfsprogs udftools xfsprogs nilfs-utils polkit gpart mtools --noconfirm"
 
 	# Audio
 	arch-chroot /mnt /bin/bash -c "pacman -S pulseaudio pavucontrol --noconfirm"
 	clear
 
-
 	# Fonts
 	arch-chroot /mnt /bin/bash -c "pacman -S gnu-free-fonts ttf-hack ttf-inconsolata gnome-font-viewer --noconfirm"
 	clear
-
 
 	# Navegador Web
 	arch-chroot /mnt /bin/bash -c "pacman -S firefox --noconfirm"
@@ -705,40 +811,48 @@ case $escritorio in
   ;;
 esac
 
+    # Directorios y appś del sistema personal
+	echo ""
+    echo "****************************************************************************************"
+	echo "                      <            PROGRAMAS               >"
+	echo "                      <            PERSONALES              >"
+	echo "****************************************************************************************"
+	echo ""
+arch-chroot /mnt /bin/bash -c "yes | pacman -S --noconfirm firefox libreoffice xreader xarchiver unrar p7zip zip unzip git wget neofetch lsb-release xdg-user-dirs gparted rhythmbox vscode plank psensor transmission-gtk kodi vlc"
 
-
-
+    echo ""
+	echo "******************************************************************************"
+	echo "<<<<<<<<<<         validar instalacion de programas              >>>>>>>>>>>>>"
+	echo "******************************************************************************"
+	echo ""
+    sleep 5
+	clear
 
 #DESMONTAR Y REINICIAR
 umount -R /mnt
 swapoff -a
-clear
 echo ""
 echo "Visita: https://t.me/ArchLinuxCristo"
 echo ""
 echo "Apóyame en Patreon: "
 echo "https://www.patreon.com/codigocristo"
-sleep 5
+    echo ""
+	echo "********************************************************************************************"
+	echo ">>>>>>>>                     Terminamos, reinicioamos                 >>>>>>>>>>>>>>>>>>>>>>"
+	echo "<<<<<<<                                y                              >>>>>>>>>>>>>>>>>>>>>>"
+	echo ">>>>>>>>                debe retire el medio de inatlación            <<<<<<<<<<<<<<<<<<<<<<"
+	echo "********************************************************************************************"
+	echo ""
+    sleep 5
 reboot
-
-
-
-
-
-
-
-
-
-
-
 
 #########################################################
 #
 # METODO DE DISCO PARA UEFI - BOOT - ROOT - HOME - SWAP 
 #
-	#+12M 			tamaño particion boot
+	#+100M 			tamaño particion boot
 	#+${swapsize}G  tamaño particion swap
-	#+77G			tamaño particion root
+	#+20G			tamaño particion root
 	#0				tamaño partición home
 	#				Cambien valores si desean
 #
@@ -804,11 +918,6 @@ reboot
 #	lsblk -l
 #	sleep 3
 #	clear
-
-
-
-
-
 
 #########################################################
 #
