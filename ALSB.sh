@@ -1,12 +1,12 @@
 #!/bin/bash
 clear
     echo ""
-	echo "******************************************************************************"
-	echo "<<<<<<<<<<<<<<<<<<        "Creador Sanbus"         >>>>>>>>>>>>>>>>>>>>>>>>>>>"
-	echo "<<<<<<<<<<<<<<<<<  "Sistema en español en liveCD"  >>>>>>>>>>>>>>>>>>>>>>>>>>>"
-	echo "<<<<<<<<<<<<<<  Verions GPT-BIOS GPT-UEFI 202306-1319 >>>>>>>>>>>>>>>>>>>>>>>>"
-	echo "<<<<<<<<<<<<<<<<<<    "Colaboración Sanbus"        >>>>>>>>>>>>>>>>>>>>>>>>>>>"
-	echo "******************************************************************************"
+	echo "*********************************************************************************************"
+	echo "<<<<<<<<<<<<<<<<<<             "Creador Sanbus"               >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "<<<<<<<<<<<<<<<<<        "Sistema en español en liveCD"         >>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "<<<<<<<<<<<<<<       Verions GPT-BIOS GPT-UEFI 202906-1200       >>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+	echo "<<<<<          "Colaboración https://www.patreon.com/codigocristo"      >>>>>>>>>>>>>>>>>>>>>"
+	echo "*********************************************************************************************"
 	echo ""
 idioma=$(curl https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF8|")
 echo ""
@@ -81,7 +81,7 @@ echo "Clave de usuario: $userpasswd"
 echo ''
 echo "Clave de Administrador: $rootpasswd"
 echo ''
-echo "Clave de Administrador: $escritorio"
+echo "Entorno de escritorio: $escritorio"
 echo ''
 
 # Vemos que opción elige el usuario y realiza tal acción en este caso mostrar mensaje
@@ -177,7 +177,10 @@ if   [ $uefi == 1 ]
 	(echo 2; echo w; echo Y) | gdisk ${disco}
 	sgdisk ${disco} -n=1:0:+100M -t=1:ef00
 	sgdisk ${disco} -n=2:0:+${swapsize}G -t=2:8200
-	sgdisk ${disco} -n=3:0:0
+	sgdisk ${disco} -n=3:0:+77G  -t=2:8300
+	sleep 5
+	sgdisk ${disco} -n=4:0:0
+	sleep 5
 	fdisk -l ${disco} > /tmp/partition
 	echo ""
 	cat /tmp/partition
@@ -238,14 +241,15 @@ elif [ $uefi == 0 ]
 	echo "******************************************************************************"
 	echo ""
 	date "+%F %H:%M"
-	swapsize=$(free --giga | awk '/^Mem:/{print $2}')
-
-    sgdisk --zap-all ${disco} #borra todas las particiones
-	
+	#swapsize=$(free --giga | awk '/^Mem:/{print $2}')
+	sgdisk --zap-all ${disco} #borra todas las particiones
+	sleep 3
+	echo "Formateo de Sector Zero"
 		sgdisk ${disco} -n=1:0:+100M -t=1:ef02
 	sleep 5
 	fdisk -l
-		sgdisk ${disco} -n=2:0:+${swapsize}G -t=2:8200
+		#sgdisk ${disco} -n=2:0:+${swapsize}G -t=2:8200
+		sgdisk ${disco} -n=2:0:+8G -t=2:8200
 	sleep 5
 	clear
 	fdisk -l
@@ -367,10 +371,12 @@ then
 	 swapon /dev/sda2             #Activando particion Swap
 	 sleep 2
 	 mkfs.ext4 /dev/sda3          #formateando particion raiz
-	#  mkfs.ext4 /dev/sda4    #FORMATEO!!!  particion home
+	  sleep 5
+     mkfs.ext4 /dev/sda4    #FORMATEO!!!  particion home
+	  sleep 5
 	 mount /dev/sda3 /mnt       # Montar las particione Raiz en carpeta temporal mnt
      mkdir /mnt/home            # Creando carpeta home en mnt
-     mount /dev/sdc1 /mnt/home  # Montar las particione HOME en carpeta mnt
+     mount /dev/sda4 /mnt/home  # Montar las particione HOME en carpeta mnt
     
 	lsblk -l
 	echo ""
@@ -632,10 +638,11 @@ elif (lspci | grep VGA | grep "Radeon R\|R2/R3/R4/R5" &>/dev/null); then
 	echo "***********************************************************************************"
 	echo "<<<<<<<<<<<<<<<<<<<<< AMD/GPU Radeon R\|R2/R3/R4/R5   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 	echo "***********************************************************************************"
-	echo ""
-    sleep 2  
-arch-chroot /mnt /bin/bash -c "pacman -S xf86-video-amdgpu mesa lib32-mesa vulkan-radeon lib32-vulkan-radeon mesa-vdpau libva-mesa-driver lib32-mesa-vdpau lib32-libva-mesa-driver libva-vdpau-driver libvdpau-va-gl libva-utils vdpauinfo opencl-mesa clinfo ocl-icd lib32-ocl-icd opencl-headers --noconfirm"
-
+	echo ""echo "Istalando....."
+    sleep 5  
+#arch-chroot /mnt /bin/bash -c "pacman -S xf86-video-amdgpu mesa lib32-mesa vulkan-radeon lib32-vulkan-radeon mesa-vdpau libva-mesa-driver lib32-mesa-vdpau lib32-libva-mesa-driver libva-vdpau-driver libvdpau-va-gl libva-utils vdpauinfo opencl-mesa clinfo ocl-icd lib32-ocl-icd opencl-headers --noconfirm"
+arch-chroot /mnt /bin/bash -c "pacman -S xf86-video-amdgpu vulkan-radeon mesa mesa-vdpau libva-mesa-driver libva-vdpau-driver libvdpau-va-gl libva-utils vdpauinfo opencl-mesa clinfo ocl-icd opencl-headers --noconfirm"
+							   #pacman -S xf86-video-amdgpu vulkan-radeon lib32-vulkan-radeon
 elif (lspci | grep VGA | grep "ATI\|AMD/ATI" &>/dev/null); then
     echo ""
 	echo "***********************************************************************************"
@@ -838,7 +845,7 @@ echo "Apóyame en Patreon: "
 echo "https://www.patreon.com/codigocristo"
     echo ""
 	echo "********************************************************************************************"
-	echo ">>>>>>>>                     Terminamos, reinicioamos                 >>>>>>>>>>>>>>>>>>>>>>"
+	echo ">>>>>>>>                     Terminamos, reiniciamos                 >>>>>>>>>>>>>>>>>>>>>>"
 	echo "<<<<<<<                                y                              >>>>>>>>>>>>>>>>>>>>>>"
 	echo ">>>>>>>>                debe retire el medio de inatlación            <<<<<<<<<<<<<<<<<<<<<<"
 	echo "********************************************************************************************"
