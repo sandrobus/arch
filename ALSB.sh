@@ -191,7 +191,7 @@ if   [ $uefi == 1 ]
 	echo $partition | awk -F ' ' '{print $1}' >  boot-efi
 	echo $partition | awk -F ' ' '{print $2}' >  swap-efi
 	echo $partition | awk -F ' ' '{print $3}' >  root-efi
-
+    echo $partition | awk -F ' ' '{print $4}' >  home-bios
 	clear
 	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
 	echo ""
@@ -203,6 +203,9 @@ if   [ $uefi == 1 ]
 	echo ""
 	echo "Partición ROOT es:"
 	cat root-efi
+	sleep 3
+	echo "Partición HOME es:"
+	cat home-bios
 	sleep 3
 
 	clear
@@ -218,15 +221,21 @@ if   [ $uefi == 1 ]
 
 	mkswap $(cat swap-efi) 
 	swapon $(cat swap-efi)
-
+	#HOME
+	mkfs.ext4 $(cat home-bios)
+	    sleep 2
+    mkdir /mnt/home
+    mount $(cat home-bios) /mnt/home
 	rm boot-efi
 	rm swap-efi
 	rm root-efi
+	RM home-bios
 
 	clear
 	echo ""
 	echo "Revise en punto de montaje en MOUNTPOINT - PRESIONE ENTER"
 	echo ""
+	echo "De lo contrario PRESIONE CONTROL + C para cancelar"
 	lsblk -l
 	read line
 
